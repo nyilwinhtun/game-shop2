@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="my" data-theme="ps-blue">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ထွန်းကြည် PS4 - Game Shop Manager</title>
+    
+    <!-- PWA Installation Web Manifest (Inline Blob) -->
+    <script>
+      const manifestData = {
+        "name": "ထွန်းကြည် PS4 ဂိမ်းဆိုင်",
+        "short_name": "ထွန်းကြည် PS4",
+        "description": "ထွန်းကြည် PlayStation 4 ဂိမ်းဆိုင်အတွက် အချိန်နှင့် ငွေစာရင်း တွက်ချက်စီမံပေးမည့် Web Application",
+        "start_url": "./",
+        "display": "standalone",
+        "background_color": "#0a1128",
+        "theme_color": "#0a1128",
+        "icons": [
+          {
+            "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%232563eb'><rect width='512' height='512' rx='100' fill='%230a1128'/><path fill='%23ffffff' d='M140 180h232c22 0 40 18 40 40v110c0 22-18 40-40 40H140c-22 0-40-18-40-40V220c0-22 18-40 40-40zm30 50v30h-30v20h30v30h20v-30h30v-20h-30v-30h-20zm180 20a15 15 0 1 0 0 30 15 15 0 0 0 0-30zm30 30a15 15 0 1 0 0 30 15 15 0 0 0 0-30z'/></svg>",
+            "sizes": "192x192 512x512",
+            "type": "image/svg+xml"
+          }
+        ]
+      };
+      const stringManifest = JSON.stringify(manifestData);
+      const blob = new Blob([stringManifest], {type: 'application/json'});
+      const manifestURL = URL.createObjectURL(blob);
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = manifestURL;
+      document.head.appendChild(link);
+    </script>
+    <meta name="theme-color" content="#0a1128">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Padauk', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Color Palette Themes via CSS Variables */
+        :root[data-theme="ps-blue"] {
+            --bg-main: #0a1128;
+            --bg-card: #121d3b;
+            --bg-card-hover: #19274e;
+            --border-color: #1e3a8a;
+            --accent-primary: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.4);
+            --accent-text: #60a5fa;
+            --status-active: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --badge-bg: rgba(37, 99, 235, 0.2);
+        }
+
+        :root[data-theme="cyberpunk"] {
+            --bg-main: #0f051d;
+            --bg-card: #1c0b36;
+            --bg-card-hover: #291050;
+            --border-color: #a855f7;
+            --accent-primary: #d946ef;
+            --accent-glow: rgba(217, 70, 239, 0.4);
+            --accent-text: #f0abfc;
+            --status-active: #22c55e;
+            --text-main: #fdf4ff;
+            --text-muted: #c084fc;
+            --badge-bg: rgba(217, 70, 239, 0.2);
+        }
+
+        :root[data-theme="emerald"] {
+            --bg-main: #022c22;
+            --bg-card: #064e3b;
+            --bg-card-hover: #047857;
+            --border-color: #059669;
+            --accent-primary: #10b981;
+            --accent-glow: rgba(16, 185, 129, 0.4);
+            --accent-text: #6ee7b7;
+            --status-active: #34d399;
+            --text-main: #ecfdf5;
+            --text-muted: #a7f3d0;
+            --badge-bg: rgba(16, 185, 129, 0.2);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-card {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+
+        .theme-card-hover:hover {
+            background-color: var(--bg-card-hover);
+        }
+
+        .theme-accent-btn {
+            background-color: var(--accent-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .theme-accent-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .theme-accent-text {
+            color: var(--accent-text);
+        }
+
+        .theme-border {
+            border-color: var(--border-color);
+        }
+
+        /* Pulse Animation for Active Stations */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px var(--status-active); }
+            50% { box-shadow: 0 0 20px var(--status-active); }
+        }
+
+        .active-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Hide Scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans pb-12 select-none">
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-30 backdrop-blur-md bg-opacity-80 border-b theme-border bg-[var(--bg-main)] px-4 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl theme-accent-btn flex items-center justify-center font-bold text-white text-xl tracking-wider">
+                PS4
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wide" id="headerShopName">ထွန်းကြည် PS4 ဂိမ်းဆိုင်</h1>
+                <p class="text-xs theme-accent-text flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                    ၁ နာရီ = <span id="headerRate">၄,၀၀၀</span> ကျပ်
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button onclick="openSettingsModal()" class="p-2.5 rounded-xl theme-card border theme-border text-gray-300 hover:text-white transition">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 py-6 max-w-5xl space-y-8">
+
+        <!-- 1. Station Management Section -->
+        <section>
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h2 class="text-lg font-bold flex items-center gap-2">
+                        <i data-lucide="gamepad-2" class="theme-accent-text"></i>
+                        ဂိမ်းစက်များ (Station Management)
+                    </h2>
+                    <p class="text-xs text-gray-400">ဖုန်းနှင့် PC များတွင် Realtime တိုင်မာ တူညီစွာ ထွက်ပါမည်</p>
+                </div>
+                <button onclick="addNewStation()" class="theme-accent-btn text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5">
+                    <i data-lucide="plus" class="w-4 h-4"></i> TV / စက်အသစ် တိုးမည်
+                </button>
+            </div>
+
+            <div id="stationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Stations dynamically populated via JS -->
+            </div>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- 2. Quick Calc & Debt Tracker Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Quick Calculator -->
+            <div class="theme-card border theme-border rounded-2xl p-5 shadow-xl space-y-4">
+                <h2 class="text-md font-bold flex items-center gap-2">
+                    <i data-lucide="calculator" class="theme-accent-text"></i>
+                    အမြန် ချိန်ကိုက် တွက်ချက်စနစ် နှင့် ကြွေးငွေ/ကျန်ငွေ စာရင်း
+                </h2>
+                <p class="text-xs text-gray-400">စတင်ချိန်/ပြီးဆုံးချိန် အလွယ်တွက်ရန် သို့မဟုတ် ပေးငွေ/ပြန်အမ်းငွေ/ကျန်ကြွေးငွေများ တွက်ရန်</p>
+
+                <div class="space-y-3">
+                    <p class="text-xs font-semibold theme-accent-text">၁။ အချိန်အလိုက် ငွေတွက်ရန်</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">စတင်သည့် အချိန်</label>
+                            <input type="time" id="calcStartTime" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400 block mb-1">ပြီးဆုံးသည့် အချိန်</label>
+                            <input type="time" id="calcEndTime" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none">
+                        </div>
+                    </div>
+                    <button onclick="calculateManualTime()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded-lg text-gray-200 transition">
+                        အချိန်ကြာချိန်နှင့် ကျသင့်ငွေ တွက်မည်
+                    </button>
+                </div>
+
+                <hr class="border-gray-800">
+
+                <div class="space-y-3">
+                    <p class="text-xs font-semibold theme-accent-text">၂။ ပေးငွေနှင့် ပြန်အမ်းငွေ/ကျန်ကြွေးငွေ</p>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">ကျသင့်ငွေ စုစုပေါင်း (ကျပ်)</label>
+                        <input type="number" id="calcTotalAmount" placeholder="ဥပမာ - ၆၀၀၀" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="calculateBalance()">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">အဆော့သမား ပေးငွေ (ကျပ်)</label>
+                        <input type="number" id="calcPaidAmount" placeholder="ဥပမာ - ၁၀၀၀၀" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none" oninput="calculateBalance()">
+                    </div>
+                    <div id="calcResultBox" class="p-3 bg-slate-900/60 rounded-xl border border-gray-800 text-center space-y-1">
+                        <span class="text-xs text-gray-400">အခြေအနေ:</span>
+                        <div id="calcStatusText" class="text-sm font-bold text-gray-300">ငွေဖြည့်သွင်းပါ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Debt Tracker List -->
+            <div class="theme-card border theme-border rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-md font-bold flex items-center gap-2">
+                            <i data-lucide="book-open" class="theme-accent-text"></i>
+                            ကျန်ကြွေးငွေ မှတ်တမ်း (Debts)
+                        </h2>
+                        <button onclick="openDebtModal()" class="text-xs bg-red-900/50 hover:bg-red-800/60 text-red-300 px-2.5 py-1 rounded-lg border border-red-700/50 flex items-center gap-1">
+                            <i data-lucide="plus" class="w-3 h-3"></i> ကြွေးသစ်တိုးမည်
+                        </button>
+                    </div>
+
+                    <div id="debtList" class="space-y-2 max-h-[300px] overflow-y-auto pr-1 no-scrollbar">
+                        <!-- Debt items loaded here -->
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-900/80 border theme-border flex justify-between items-center">
+                    <span class="text-xs text-gray-400">စုစုပေါင်း ရရန်ကျန်ကြွေးငွေ:</span>
+                    <span id="totalDebtText" class="text-md font-bold text-red-400">၀ ကျပ်</span>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal: Station Menu / Extras (Snacks) -->
+    <div id="extrasModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="theme-card border theme-border w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="font-bold text-lg flex items-center gap-2" id="extrasModalTitle">
+                    <i data-lucide="coffee" class="theme-accent-text"></i> မုန့်/အချိုရည် ထည့်ရန်
+                </h3>
+                <button onclick="closeExtrasModal()" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div id="snackItemsContainer" class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
+                <!-- Preset items dynamically populated -->
+            </div>
+
+            <div class="border-t border-gray-800 pt-3 space-y-2">
+                <p class="text-xs text-gray-400">စိတ်ကြိုက် ပစ္စည်း/မုန့် ထည့်ရန်</p>
+                <div class="flex gap-2">
+                    <input type="text" id="customSnackName" placeholder="ပစ္စည်းအမည်" class="flex-grow bg-slate-900 border theme-border rounded-lg px-3 py-1.5 text-xs text-white">
+                    <input type="number" id="customSnackPrice" placeholder="စျေးနှုန်း" class="w-24 bg-slate-900 border theme-border rounded-lg px-3 py-1.5 text-xs text-white">
+                    <button onclick="addCustomSnackToStation()" class="theme-accent-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-white">ထည့်မည်</button>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="closeExtrasModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl text-white">ပြီးပြီ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Debt Record Add -->
+    <div id="debtModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="theme-card border theme-border w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="font-bold text-lg flex items-center gap-2 text-red-400">
+                    <i data-lucide="user-minus"></i> ကြွေးငွေသစ် မှတ်တမ်းတင်ရန်
+                </h3>
+                <button onclick="closeDebtModal()" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">အမည် / လူပုဂ္ဂိုလ်</label>
+                    <input type="text" id="debtCustomerName" placeholder="ဥပမာ - ကိုအောင်" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">ကျန်ကြွေးငွေ ပမာဏ (ကျပ်)</label>
+                    <input type="number" id="debtAmount" placeholder="ဥပမာ - ၂၅၀၀" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">အကြောင်းအရာ / မှတ်ချက်</label>
+                    <input type="text" id="debtNote" placeholder="ဥပမာ - စက် ၃ မနေ့က ဆော့ကြွေး" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeDebtModal()" class="px-4 py-2 bg-slate-800 text-xs rounded-xl text-gray-300">မလုပ်တော့ပါ</button>
+                <button onclick="saveDebtRecord()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-xs rounded-xl text-white font-semibold">သိမ်းဆည်းမည်</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Settings -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="theme-card border theme-border w-full max-w-md rounded-2xl p-5 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i data-lucide="sliders" class="theme-accent-text"></i> စနစ် ဆက်တင်များ
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">ဆိုင်အမည် ပြင်ရန်</label>
+                    <input type="text" id="settingShopName" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">၁ နာရီ နှုန်းထား (ကျပ်)</label>
+                    <input type="number" id="settingHourlyRate" class="w-full bg-slate-900 border theme-border rounded-lg px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-2">Theme အရောင် ပြောင်းရန်</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setTheme('ps-blue')" class="py-2 rounded-lg bg-blue-900/60 border border-blue-500 text-xs text-blue-200 hover:bg-blue-800">PS Blue</button>
+                        <button onclick="setTheme('cyberpunk')" class="py-2 rounded-lg bg-purple-900/60 border border-purple-500 text-xs text-purple-200 hover:bg-purple-800">Cyberpunk</button>
+                        <button onclick="setTheme('emerald')" class="py-2 rounded-lg bg-emerald-900/60 border border-emerald-500 text-xs text-emerald-200 hover:bg-emerald-800">Emerald</button>
+                    </div>
+                </div>
+
+                <hr class="border-gray-800">
+
+                <!-- Bluetooth Printer Section -->
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Bluetooth Thermal Printer ချိတ်ဆက်ရန်</label>
+                    <button onclick="connectBluetoothPrinter()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium flex items-center justify-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Printer ရှာပြီး ချိတ်ဆက်မည်
+                    </button>
+                    <p id="printerStatus" class="text-[10px] text-gray-500 mt-1 text-center">Printer ချိတ်ဆက်ထားခြင်း မရှိသေးပါ</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="saveSettings()" class="w-full py-2.5 theme-accent-btn text-xs font-bold text-white rounded-xl">ဆက်တင်များ သိမ်းမည်</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Printable Receipt Modal / Hidden Area -->
+    <div id="receiptModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white text-black w-full max-w-sm rounded-xl p-5 space-y-4 font-mono shadow-2xl">
+            <div class="text-center border-b border-dashed border-gray-400 pb-3">
+                <h2 class="text-lg font-bold" id="recShopName">ထွန်းကြည် PS4</h2>
+                <p class="text-xs text-gray-600">ဂိမ်းဆော့/မုန့်ဝယ်ယူမှု ဘောက်ချာ</p>
+                <p class="text-[10px] text-gray-500" id="recDateTime"></p>
+            </div>
+
+            <div class="text-xs space-y-1">
+                <div class="flex justify-between"><span class="font-bold" id="recStationName">စက် (၁)</span> <span id="recDuration">00:00:00</span></div>
+                <div class="flex justify-between"><span>အချိန်ကျသင့်ငွေ:</span> <span id="recTimeCost">၀ ကျပ်</span></div>
+            </div>
+
+            <div class="border-t border-dashed border-gray-300 pt-2 text-xs space-y-1" id="recItemsList">
+                <!-- Snacks list -->
+            </div>
+
+            <div class="border-t border-b border-black py-2 text-xs space-y-1 font-bold">
+                <div class="flex justify-between"><span>စုစုပေါင်း ကျသင့်ငွေ:</span> <span id="recGrandTotal">၀ ကျပ်</span></div>
+            </div>
+
+            <div class="text-center text-[10px] text-gray-500 pt-1">
+                ကျေးဇူးအထူးတင်ရှိပါသည်။ နောက်လည်း လာရောက်အားပေးပါဦး။
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeReceiptModal()" class="flex-1 py-2 bg-gray-200 text-xs rounded-lg text-black font-sans font-semibold">ပိတ်မည်</button>
+                <button onclick="printReceiptDirect()" class="flex-1 py-2 bg-blue-600 text-xs rounded-lg text-white font-sans font-semibold flex items-center justify-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print ထုတ်မည်
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Core Logic -->
+    <script>
+        // State Management
+        let appState = {
+            shopName: "ထွန်းကြည် PS4 ဂိမ်းဆိုင်",
+            hourlyRate: 4000,
+            theme: "ps-blue",
+            stations: [],
+            debts: []
+        };
+
+        let currentActiveExtrasStationId = null;
+        let bluetoothDevice = null;
+        let bluetoothServer = null;
+
+        const defaultSnacks = [
+            { name: "ကော်ဖီ / တီးစီ", price: 1000 },
+            { name: "Coca Cola / Pepsi", price: 1200 },
+            { name: "M-150 / Red Bull", price: 1500 },
+            { name: "အာလူးကြော် / Snack", price: 1000 },
+            { name: "ရေသန့်", price: 500 }
+        ];
+
+        // Initialize App
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFromLocalStorage();
+            applyTheme(appState.theme);
+            updateHeaderUI();
+            
+            if (!appState.stations || appState.stations.length === 0) {
+                // Default 3 Stations if empty
+                appState.stations = [
+                    createNewStationObject(1, "TV - 1 (PS4)"),
+                    createNewStationObject(2, "TV - 2 (PS4)"),
+                    createNewStationObject(3, "TV - 3 (PS4)")
+                ];
+                saveToLocalStorage();
+            }
+
+            renderStations();
+            renderDebts();
+            lucide.createIcons();
+
+            // Timer Loop
+            setInterval(updateTimersUI, 1000);
+        });
+
+        function createNewStationObject(id, name) {
+            return {
+                id: id || Date.now(),
+                name: name || `TV - ${appState.stations.length + 1}`,
+                status: 'IDLE', // IDLE, RUNNING, PAUSED
+                startTime: null,
+                elapsedSeconds: 0,
+                items: []
+            };
+        }
+
+        // --- LocalStorage Operations ---
+        function saveToLocalStorage() {
+            localStorage.setItem("tunkyi_ps4_state", JSON.stringify(appState));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem("tunkyi_ps4_state");
+            if (saved) {
+                try {
+                    appState = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Failed to parse local storage", e);
+                }
+            }
+        }
+
+        // --- UI Render Functions ---
+        function updateHeaderUI() {
+            document.getElementById("headerShopName").innerText = appState.shopName;
+            document.getElementById("headerRate").innerText = Number(appState.hourlyRate).toLocaleString();
+        }
+
+        function renderStations() {
+            const grid = document.getElementById("stationsGrid");
+            grid.innerHTML = "";
+
+            appState.stations.forEach(station => {
+                const card = document.createElement("div");
+                card.className = `theme-card border theme-border rounded-2xl p-4 transition shadow-lg relative flex flex-col justify-between ${station.status === 'RUNNING' ? 'active-glow border-emerald-500/50' : ''}`;
+
+                const timeCost = calculateTimeCost(station.elapsedSeconds);
+                const itemsCost = station.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const totalCost = timeCost + itemsCost;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-md flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full ${station.status === 'RUNNING' ? 'bg-emerald-400' : station.status === 'PAUSED' ? 'bg-amber-400' : 'bg-gray-500'}"></span>
+                                ${station.name}
+                            </h3>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold ${station.status === 'RUNNING' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-gray-400'}">
+                                ${station.status}
+                            </span>
+                        </div>
+
+                        <div class="my-3 text-center py-3 bg-slate-900/80 rounded-xl border border-gray-800/80">
+                            <div class="text-3xl font-mono font-bold tracking-tight text-white" id="timer-display-${station.id}">
+                                ${formatTime(station.elapsedSeconds)}
+                            </div>
+                            <div class="text-xs text-gray-400 mt-1">
+                                အချိန်ဖိုး: <span class="theme-accent-text font-semibold" id="time-cost-${station.id}">${timeCost.toLocaleString()}</span> ကျပ်
+                            </div>
+                        </div>
+
+                        <!-- Extras List inside station -->
+                        <div class="space-y-1 mb-3">
+                            <div class="flex justify-between items-center text-xs text-gray-400 mb-1">
+                                <span>မုန့်/အချိုရည်များ:</span>
+                                <button onclick="openExtrasModal(${station.id})" class="theme-accent-text hover:underline text-[11px] flex items-center gap-0.5">
+                                    <i data-lucide="plus" class="w-3 h-3"></i> ထည့်မည်
+                                </button>
+                            </div>
+                            ${station.items.length === 0 ? '<p class="text-[11px] text-gray-600 italic">မရှိသေးပါ</p>' : ''}
+                            ${station.items.map(item => `
+                                <div class="flex justify-between items-center text-xs bg-slate-900/40 px-2 py-1 rounded border border-gray-800/50">
+                                    <span>${item.name} x${item.quantity}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-gray-300">${(item.price * item.quantity).toLocaleString()} ကျပ်</span>
+                                        <button onclick="removeExtraItem(${station.id}, '${item.name}')" class="text-red-400 hover:text-red-300">
+                                            <i data-lucide="x" class="w-3 h-3"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="border-t border-gray-800 pt-2 mb-3 flex justify-between items-center">
+                            <span class="text-xs text-gray-400 font-medium">စုစုပေါင်း ကျသင့်ငွေ:</span>
+                            <span class="text-md font-bold text-emerald-400" id="total-cost-${station.id}">${totalCost.toLocaleString()} ကျပ်</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-2">
+                            ${station.status === 'RUNNING' ? `
+                                <button onclick="pauseStation(${station.id})" class="py-2 bg-amber-600/80 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1">
+                                    <i data-lucide="pause" class="w-3.5 h-3.5"></i> ခေတ္တရပ်မည်
+                                </button>
+                            ` : `
+                                <button onclick="startStation(${station.id})" class="py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1">
+                                    <i data-lucide="play" class="w-3.5 h-3.5"></i> ${station.status === 'PAUSED' ? 'ပြန်စမည်' : 'စတင်မည်'}
+                                </button>
+                            `}
+                            
+                            <button onclick="stopAndClearStation(${station.id})" class="py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1">
+                                <i data-lucide="square" class="w-3.5 h-3.5"></i> သိမ်းမည်/ရှင်းမည်
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Timer Calculations
+        function updateTimersUI() {
+            const now = Date.now();
+            let stateChanged = false;
+
+            appState.stations.forEach(station => {
+                if (station.status === 'RUNNING') {
+                    // Update elapsed time based on real timestamp delta
+                    if (!station.lastTick) station.lastTick = now;
+                    const delta = Math.floor((now - station.lastTick) / 1000);
+                    if (delta >= 1) {
+                        station.elapsedSeconds += delta;
+                        station.lastTick = now;
+                        stateChanged = true;
+                    }
+
+                    // Update live element text directly for efficiency
+                    const timerEl = document.getElementById(`timer-display-${station.id}`);
+                    const timeCostEl = document.getElementById(`time-cost-${station.id}`);
+                    const totalCostEl = document.getElementById(`total-cost-${station.id}`);
+
+                    if (timerEl) timerEl.innerText = formatTime(station.elapsedSeconds);
+                    
+                    const timeCost = calculateTimeCost(station.elapsedSeconds);
+                    if (timeCostEl) timeCostEl.innerText = timeCost.toLocaleString();
+
+                    const itemsCost = station.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    if (totalCostEl) totalCostEl.innerText = (timeCost + itemsCost).toLocaleString() + " ကျပ်";
+                }
+            });
+
+            if (stateChanged) {
+                saveToLocalStorage();
+            }
+        }
+
+        function calculateTimeCost(seconds) {
+            const hours = seconds / 3600;
+            return Math.ceil(hours * appState.hourlyRate);
+        }
+
+        function formatTime(totalSeconds) {
+            const hrs = Math.floor(totalSeconds / 3600);
+            const mins = Math.floor((totalSeconds % 3600) / 60);
+            const secs = totalSeconds % 60;
+            return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Station Control Handlers
+        function startStation(id) {
+            const station = appState.stations.find(s => s.id === id);
+            if (station) {
+                station.status = 'RUNNING';
+                station.lastTick = Date.now();
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        function pauseStation(id) {
+            const station = appState.stations.find(s => s.id === id);
+            if (station) {
+                station.status = 'PAUSED';
+                station.lastTick = null;
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        function stopAndClearStation(id) {
+            const station = appState.stations.find(s => s.id === id);
+            if (!station) return;
+
+            // Show Receipt
+            showReceiptModal(station);
+        }
+
+        function resetStationData(id) {
+            const station = appState.stations.find(s => s.id === id);
+            if (station) {
+                station.status = 'IDLE';
+                station.elapsedSeconds = 0;
+                station.items = [];
+                station.lastTick = null;
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        function addNewStation() {
+            const name = prompt("TV / စက်အမည် ထည့်ပါ:", `TV - ${appState.stations.length + 1}`);
+            if (name) {
+                appState.stations.push(createNewStationObject(Date.now(), name));
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        // --- Extras (Snacks) Handling ---
+        function openExtrasModal(stationId) {
+            currentActiveExtrasStationId = stationId;
+            const container = document.getElementById("snackItemsContainer");
+            container.innerHTML = "";
+
+            defaultSnacks.forEach(snack => {
+                const div = document.createElement("div");
+                div.className = "flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border theme-border";
+                div.innerHTML = `
+                    <div>
+                        <div class="text-xs font-bold text-white">${snack.name}</div>
+                        <div class="text-[10px] text-gray-400">${snack.price.toLocaleString()} ကျပ်</div>
+                    </div>
+                    <button onclick="addPresetSnack('${snack.name}', ${snack.price})" class="theme-accent-btn px-2.5 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3 h-3"></i> ထည့်မည်
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+
+            lucide.createIcons();
+            document.getElementById("extrasModal").classList.remove("hidden");
+        }
+
+        function closeExtrasModal() {
+            document.getElementById("extrasModal").classList.add("hidden");
+            currentActiveExtrasStationId = null;
+        }
+
+        function addPresetSnack(name, price) {
+            if (!currentActiveExtrasStationId) return;
+            const station = appState.stations.find(s => s.id === currentActiveExtrasStationId);
+            if (station) {
+                const existingItem = station.items.find(i => i.name === name);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    station.items.push({ name, price, quantity: 1 });
+                }
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        function addCustomSnackToStation() {
+            const nameInput = document.getElementById("customSnackName");
+            const priceInput = document.getElementById("customSnackPrice");
+            
+            const name = nameInput.value.trim();
+            const price = parseFloat(priceInput.value);
+
+            if (name && !isNaN(price) && price >= 0) {
+                addPresetSnack(name, price);
+                nameInput.value = "";
+                priceInput.value = "";
+            }
+        }
+
+        function removeExtraItem(stationId, itemName) {
+            const station = appState.stations.find(s => s.id === stationId);
+            if (station) {
+                station.items = station.items.filter(i => i.name !== itemName);
+                saveToLocalStorage();
+                renderStations();
+            }
+        }
+
+        // --- Manual Calculator Logic ---
+        function calculateManualTime() {
+            const startVal = document.getElementById("calcStartTime").value;
+            const endVal = document.getElementById("calcEndTime").value;
+
+            if (!startVal || !endVal) {
+                alert("စတင်ချိန် နှင့် ပြီးဆုံးချိန် နှစ်ခုစလုံး ဖြည့်ပေးပါ");
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const startDate = new Date(`${today}T${startVal}`);
+            let endDate = new Date(`${today}T${endVal}`);
+
+            if (endDate < startDate) {
+                // Passed midnight
+                endDate.setDate(endDate.getDate() + 1);
+            }
+
+            const diffSeconds = Math.floor((endDate - startDate) / 1000);
+            const cost = calculateTimeCost(diffSeconds);
+
+            document.getElementById("calcTotalAmount").value = cost;
+            calculateBalance();
+        }
+
+        function calculateBalance() {
+            const total = parseFloat(document.getElementById("calcTotalAmount").value) || 0;
+            const paid = parseFloat(document.getElementById("calcPaidAmount").value) || 0;
+            const statusText = document.getElementById("calcStatusText");
+
+            if (total === 0 && paid === 0) {
+                statusText.className = "text-sm font-bold text-gray-300";
+                statusText.innerText = "ငွေဖြည့်သွင်းပါ";
+                return;
+            }
+
+            const diff = paid - total;
+            if (diff === 0) {
+                statusText.className = "text-sm font-bold text-emerald-400";
+                statusText.innerText = "ကွက်တိ ပေးချေပြီးပါပြီ";
+            } else if (diff > 0) {
+                statusText.className = "text-sm font-bold text-blue-400";
+                statusText.innerText = `ပြန်အမ်းငွေ: ${diff.toLocaleString()} ကျပ်`;
+            } else {
+                statusText.className = "text-sm font-bold text-red-400";
+                statusText.innerText = `ကျန်ကြွေးငွေ: ${Math.abs(diff).toLocaleString()} ကျပ်`;
+            }
+        }
+
+        // --- Debt Tracker System ---
+        function renderDebts() {
+            const list = document.getElementById("debtList");
+            list.innerHTML = "";
+
+            let totalDebt = 0;
+
+            if (!appState.debts || appState.debts.length === 0) {
+                list.innerHTML = '<p class="text-xs text-gray-500 italic text-center py-4">ကြွေးကျန် မှတ်တမ်း မရှိပါ</p>';
+            } else {
+                appState.debts.forEach((d, index) => {
+                    totalDebt += d.amount;
+                    const item = document.createElement("div");
+                    item.className = "bg-slate-900/80 border border-red-900/30 p-2.5 rounded-xl flex justify-between items-center text-xs";
+                    item.innerHTML = `
+                        <div>
+                            <div class="font-bold text-white">${d.name}</div>
+                            <div class="text-[10px] text-gray-400">${d.note || 'မှတ်ချက်မရှိ'} • ${d.date}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-red-400">${d.amount.toLocaleString()} ကျပ်</span>
+                            <button onclick="deleteDebtRecord(${index})" class="text-xs bg-emerald-900/50 hover:bg-emerald-800 text-emerald-300 px-2 py-1 rounded">
+                                ဆပ်ပြီး
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+
+            document.getElementById("totalDebtText").innerText = totalDebt.toLocaleString() + " ကျပ်";
+        }
+
+        function openDebtModal() {
+            document.getElementById("debtModal").classList.remove("hidden");
+        }
+
+        function closeDebtModal() {
+            document.getElementById("debtModal").classList.add("hidden");
+        }
+
+        function saveDebtRecord() {
+            const name = document.getElementById("debtCustomerName").value.trim();
+            const amount = parseFloat(document.getElementById("debtAmount").value);
+            const note = document.getElementById("debtNote").value.trim();
+
+            if (name && !isNaN(amount) && amount > 0) {
+                if (!appState.debts) appState.debts = [];
+                appState.debts.push({
+                    name,
+                    amount,
+                    note,
+                    date: new Date().toLocaleDateString('my-MM')
+                });
+                saveToLocalStorage();
+                renderDebts();
+                closeDebtModal();
+
+                document.getElementById("debtCustomerName").value = "";
+                document.getElementById("debtAmount").value = "";
+                document.getElementById("debtNote").value = "";
+            }
+        }
+
+        function deleteDebtRecord(index) {
+            if (confirm("ဒီကြွေးငွေ ဆပ်ပြီးပြီဟု သတ်မှတ်မှာ သေချာပါသလား?")) {
+                appState.debts.splice(index, 1);
+                saveToLocalStorage();
+                renderDebts();
+            }
+        }
+
+        // --- Receipt and Printing ---
+        let currentStationForReceipt = null;
+
+        function showReceiptModal(station) {
+            currentStationForReceipt = station;
+            
+            const timeCost = calculateTimeCost(station.elapsedSeconds);
+            const itemsCost = station.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const grandTotal = timeCost + itemsCost;
+
+            document.getElementById("recShopName").innerText = appState.shopName;
+            document.getElementById("recDateTime").innerText = new Date().toLocaleString();
+            document.getElementById("recStationName").innerText = station.name;
+            document.getElementById("recDuration").innerText = formatTime(station.elapsedSeconds);
+            document.getElementById("recTimeCost").innerText = timeCost.toLocaleString() + " ကျပ်";
+
+            const itemsContainer = document.getElementById("recItemsList");
+            itemsContainer.innerHTML = "";
+            station.items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "flex justify-between";
+                div.innerHTML = `<span>${item.name} x${item.quantity}</span> <span>${(item.price * item.quantity).toLocaleString()} ကျပ်</span>`;
+                itemsContainer.appendChild(div);
+            });
+
+            document.getElementById("recGrandTotal").innerText = grandTotal.toLocaleString() + " ကျပ်";
+            document.getElementById("receiptModal").classList.remove("hidden");
+        }
+
+        function closeReceiptModal() {
+            if (currentStationForReceipt) {
+                resetStationData(currentStationForReceipt.id);
+            }
+            document.getElementById("receiptModal").classList.add("hidden");
+            currentStationForReceipt = null;
+        }
+
+        // Bluetooth Thermal Printer Integration (ESC/POS)
+        async function connectBluetoothPrinter() {
+            const statusEl = document.getElementById("printerStatus");
+            try {
+                statusEl.innerText = "Printer ရှာနေပါသည်...";
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] // Common printer service UUID
+                });
+
+                bluetoothServer = await bluetoothDevice.gatt.connect();
+                statusEl.innerText = "ချိတ်ဆက်ပြီးပါပြီ: " + bluetoothDevice.name;
+                statusEl.className = "text-[10px] text-emerald-400 mt-1 text-center font-bold";
+            } catch (error) {
+                console.error(error);
+                statusEl.innerText = "ချိတ်ဆက်မှု မအောင်မြင်ပါ (သို့) ပယ်ဖျက်လိုက်သည်";
+                statusEl.className = "text-[10px] text-red-400 mt-1 text-center";
+            }
+        }
+
+        async function printReceiptDirect() {
+            if (!bluetoothServer) {
+                // Fallback to Window System Print
+                window.print();
+                closeReceiptModal();
+                return;
+            }
+
+            try {
+                // Thermal print via Bluetooth ESC/POS
+                const services = await bluetoothServer.getPrimaryServices();
+                if (services.length === 0) {
+                    window.print();
+                    closeReceiptModal();
+                    return;
+                }
+
+                const characteristics = await services[0].getCharacteristics();
+                const writeCharacteristic = characteristics[0];
+
+                const encoder = new TextEncoder();
+                let text = `========================\n`;
+                text += `   ${appState.shopName}\n`;
+                text += `========================\n`;
+                text += `Date: ${new Date().toLocaleDateString()}\n`;
+                text += `Station: ${currentStationForReceipt.name}\n`;
+                text += `Duration: ${formatTime(currentStationForReceipt.elapsedSeconds)}\n`;
+                text += `------------------------\n`;
+                
+                const timeCost = calculateTimeCost(currentStationForReceipt.elapsedSeconds);
+                text += `Time Cost: ${timeCost} Ks\n`;
+
+                currentStationForReceipt.items.forEach(i => {
+                    text += `${i.name} x${i.quantity}: ${i.price * i.quantity} Ks\n`;
+                });
+
+                const itemsCost = currentStationForReceipt.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                text += `------------------------\n`;
+                text += `TOTAL: ${timeCost + itemsCost} Ks\n`;
+                text += `========================\n\n\n`;
+
+                await writeCharacteristic.writeValue(encoder.encode(text));
+                closeReceiptModal();
+            } catch (e) {
+                console.error("Bluetooth print failed, falling back to window print", e);
+                window.print();
+                closeReceiptModal();
+            }
+        }
+
+        // --- Settings & Themes ---
+        function openSettingsModal() {
+            document.getElementById("settingShopName").value = appState.shopName;
+            document.getElementById("settingHourlyRate").value = appState.hourlyRate;
+            document.getElementById("settingsModal").classList.remove("hidden");
+        }
+
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").classList.add("hidden");
+        }
+
+        function setTheme(themeName) {
+            appState.theme = themeName;
+            applyTheme(themeName);
+            saveToLocalStorage();
+        }
+
+        function applyTheme(themeName) {
+            document.documentElement.setAttribute("data-theme", themeName);
+        }
+
+        function saveSettings() {
+            const name = document.getElementById("settingShopName").value.trim();
+            const rate = parseFloat(document.getElementById("settingHourlyRate").value);
+
+            if (name) appState.shopName = name;
+            if (!isNaN(rate) && rate > 0) appState.hourlyRate = rate;
+
+            saveToLocalStorage();
+            updateHeaderUI();
+            renderStations();
+            closeSettingsModal();
+        }
+    </script>
+</body>
+</html>
