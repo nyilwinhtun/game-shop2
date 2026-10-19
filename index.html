@@ -115,13 +115,13 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-24 select-none">
 
-    <!-- AUTO INSTALL BANNER -->
+    <!-- ANDROID DIRECT INSTALL BUTTON BANNER -->
     <div id="installContainer" class="fixed bottom-16 left-3 right-3 z-50 hidden glass-card p-4 rounded-2xl border border-indigo-500/50 shadow-2xl flex items-center justify-between gap-3 bg-slate-900/95">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl accent-btn flex items-center justify-center text-white font-bold text-base">GBT</div>
             <div>
                 <h4 class="text-xs font-bold text-white" data-i18n="installPromptTitle">App ကို ဖုန်းတွင် Install တင်ရန်</h4>
-                <p class="text-[10px] text-gray-400" data-i18n="installPromptSub">Home Screen သို့ ထည့်သွင်းပါ</p>
+                <p class="text-[10px] text-gray-400" data-i18n="installPromptSub">Home Screen သို့ ချက်ချင်း ထည့်သွင်းပါ</p>
             </div>
         </div>
         <button onclick="triggerInstall()" class="px-4 py-2 accent-btn text-white font-bold rounded-xl text-xs cursor-pointer shadow-lg">Install Now</button>
@@ -349,26 +349,17 @@
 
                 <button onclick="saveSettings()" class="w-full py-2.5 accent-btn text-xs font-bold text-white rounded-xl cursor-pointer" data-i18n="saveSettingsBtn">ဆက်တင်များ သိမ်းဆည်းမည်</button>
             </div>
-
-            <div class="space-y-3 text-xs text-gray-300 leading-relaxed pt-1">
-                <div class="font-bold text-white text-xs flex items-center gap-1 border-b border-gray-800 pb-1">
-                    <i data-lucide="book-open" class="w-3.5 h-3.5 accent-text"></i> <span>၂။ အသုံးပြုပုံ အသေးစိတ် လမ်းညွှန်ချက်များ</span>
-                </div>
-                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
-                    <div class="font-bold text-indigo-400">🎮 PlayStation နှင့် ဘိလိယက်ခုံများ စီမံခန့်ခွဲပုံ</div>
-                    <p>• Start / Stop နှိပ်၍ အချိန်စတင်ရေတွက်နိုင်ပြီး POS မှ မုန့်နှင့် အဖျော်ယမကာများ ထပ်မံပေါင်းထည့်နိုင်ပါသည်။</p>
-                </div>
-            </div>
         </div>
     </div>
 
     <script>
         // --- AUTO INSTALL PROMPT (PWA) ---
-        let deferredPrompt;
+        let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installContainer').classList.remove('hidden');
+            const banner = document.getElementById('installContainer');
+            if (banner) banner.classList.remove('hidden');
         });
 
         function triggerInstall() {
@@ -439,7 +430,7 @@
         const translations = {
             my: {
                 installPromptTitle: "App ကို ဖုန်းတွင် Install တင်ရန်",
-                installPromptSub: "Home Screen သို့ ထည့်သွင်းပါ",
+                installPromptSub: "Home Screen သို့ ချက်ချင်း ထည့်သွင်းပါ",
                 loginTitle: "အကောင့်ဝင်ရန် (Login)",
                 emailLabel: "အီးမေးလ် (Email)",
                 passLabel: "စကားဝှက် (Password)",
