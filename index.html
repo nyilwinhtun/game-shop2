@@ -6,7 +6,7 @@
     <title>Game & Billiards Timer</title>
     
     <!-- PWA Manifest & App Meta Tags -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Game & Billiards Timer","short_name":"GBTimer","start_url":".","display":"standalone","background_color":"%230b0f19","theme_color":"%230b0f19","icons":[{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop","sizes":"192x192","type":"image/jpeg"},{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop","sizes":"512x512","type":"image/jpeg"}]}'>
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{%22name%22:%22Game%20%26%20Billiards%20Timer%22,%22short_name%22:%22GBTimer%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%230b0f19%22,%22theme_color%22:%22%230b0f19%22,%22icons%22:[{%22src%22:%22https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop%22,%22sizes%22:%22192x192%22,%22type%22:%22image/jpeg%22},{%22src%22:%22https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop%22,%22sizes%22:%22512x512%22,%22type%22:%22image/jpeg%22}]}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Game & Billiards Timer">
@@ -367,6 +367,15 @@
     </div>
 
     <script>
+        // --- SERVICE WORKER REGISTRATION FOR PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",function(e){});')
+                .then(reg => console.log('Service Worker registered!'))
+                .catch(err => console.log('Service Worker error: ', err));
+            });
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyAto7pibrqOrxaRrOExDmJQX11Ybv_9zPs",
             authDomain: "my-website-1b6b7.firebaseapp.com",
@@ -680,7 +689,6 @@
             lucide.createIcons();
         }
 
-        // --- CHECKOUT SUMMARY MODAL FUNCTIONS ---
         function openCheckoutModal(type, id) {
             const list = type === 'ps4' ? appState.ps4Stations : appState.poolTables;
             let item = list.find(s => s.id === id);
@@ -897,7 +905,6 @@
             }
         }
 
-        // --- REAL BLUETOOTH THERMAL PRINTER API ---
         async function connectBluetoothPrinter() {
             try {
                 if (!navigator.bluetooth) {
@@ -1025,4 +1032,4 @@
         }
     </script>
 </body>
-</html>
+</html>s
