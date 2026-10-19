@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game & Billiards Timer</title>
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Game and Billiards Timer","short_name":"GBTimer","start_url":".","display":"standalone","background_color":"%230b0f19","theme_color":"%230b0f19","icons":[{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop","sizes":"192x192","type":"image/jpeg"},{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop","sizes":"512x512","type":"image/jpeg"}]}'>
+    <!-- PWA External Manifest & Meta Tags -->
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Game & Billiards Timer">
@@ -362,19 +362,12 @@
     </div>
 
     <script>
-        // --- PROPER SERVICE WORKER FOR ANDROID CHROME PWA ---
+        // --- STANDARD SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png') // Dummy scope bypass or standard registration
-                .catch(err => console.log(':))'));
-                
-                // Actual inline blob service worker registration for standalone check
-                const swCode = `self.addEventListener('fetch', function(event) { event.respondWith(fetch(event.request)); });`;
-                const blob = new Blob([swCode], { type: 'text/javascript' });
-                const swUrl = URL.createObjectURL(blob);
-                navigator.serviceWorker.register(swUrl)
-                    .then(() => console.log("PWA Service Worker Active"))
-                    .catch(err => console.log("SW registration failed", err));
+                navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+                .catch(err => console.log('Service Worker registration failed: ', err));
             });
         }
 
