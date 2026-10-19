@@ -11,7 +11,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Game & Billiards Timer">
     <meta name="theme-color" content="#0b0f19">
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=192&h=192&fit=crop">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -114,6 +114,21 @@
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-24 select-none">
+
+    <!-- AUTO INSTALL BANNER (POP-UP) -->
+    <div id="installBanner" class="fixed bottom-16 left-3 right-3 z-50 hidden glass-card p-4 rounded-2xl border border-indigo-500/40 shadow-2xl flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl accent-btn flex items-center justify-center text-white font-bold text-base">GBT</div>
+            <div>
+                <h4 class="text-xs font-bold text-white">App ကို ဖုန်းတွင် တင်မည်လား?</h4>
+                <p class="text-[10px] text-gray-400">Home Screen တွင် ထည့်သွင်းပြီး အလွယ်တကူ သုံးပါ။</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="dismissInstallBanner()" class="px-3 py-1.5 bg-slate-800 text-gray-300 rounded-xl text-xs cursor-pointer">မလုပ်တော့ပါ</button>
+            <button onclick="triggerInstall()" class="px-3 py-1.5 accent-btn text-white font-bold rounded-xl text-xs cursor-pointer shadow">Install</button>
+        </div>
+    </div>
 
     <!-- AUTH OVERLAY -->
     <div id="authOverlay" class="fixed inset-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -362,12 +377,34 @@
     </div>
 
     <script>
-        // --- STANDARD SERVICE WORKER REGISTRATION ---
+        // --- AUTO INSTALL PROMPT (PWA) ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.remove('hidden');
+        });
+
+        function triggerInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.add('hidden');
+                });
+            }
+        }
+
+        function dismissInstallBanner() {
+            document.getElementById('installBanner').classList.add('hidden');
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker registered successfully!', reg.scope))
-                .catch(err => console.log('Service Worker registration failed: ', err));
+                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
             });
         }
 
