@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game & Billiards Timer</title>
     
-    <!-- PWA & Home Screen Meta Tags -->
+    <!-- PWA Manifest & App Meta Tags -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Game & Billiards Timer","short_name":"GBTimer","start_url":".","display":"standalone","background_color":"%230b0f19","theme_color":"%230b0f19","icons":[{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop","sizes":"192x192","type":"image/jpeg"},{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop","sizes":"512x512","type":"image/jpeg"}]}'>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Game & Billiards Timer">
@@ -16,6 +17,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +44,7 @@
     <style>
         :root[data-theme="dark"] {
             --bg-main: #0b0f19;
-            --bg-card: rgba(17, 24, 39, 0.8);
+            --bg-card: rgba(17, 24, 39, 0.85);
             --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #f3f4f6;
             --accent-primary: #6366f1;
@@ -51,7 +54,7 @@
 
         :root[data-theme="light"] {
             --bg-main: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card: rgba(255, 255, 255, 0.95);
             --border-color: rgba(0, 0, 0, 0.08);
             --text-main: #0f172a;
             --accent-primary: #4f46e5;
@@ -61,7 +64,7 @@
 
         :root[data-theme="emerald"] {
             --bg-main: #022c22;
-            --bg-card: rgba(6, 78, 59, 0.8);
+            --bg-card: rgba(6, 78, 59, 0.85);
             --border-color: rgba(52, 211, 153, 0.15);
             --text-main: #ecfdf5;
             --accent-primary: #10b981;
@@ -71,7 +74,7 @@
 
         :root[data-theme="ocean"] {
             --bg-main: #082f49;
-            --bg-card: rgba(12, 74, 110, 0.8);
+            --bg-card: rgba(12, 74, 110, 0.85);
             --border-color: rgba(56, 189, 248, 0.15);
             --text-main: #f0f9ff;
             --accent-primary: #0284c7;
@@ -117,130 +120,113 @@
         <div class="glass-card w-full max-w-sm rounded-3xl p-6 text-center space-y-5 shadow-2xl border border-indigo-500/25">
             <div class="w-14 h-14 rounded-2xl accent-btn mx-auto flex items-center justify-center font-extrabold text-white text-xl">GBT</div>
             <div>
-                <h1 class="text-lg font-bold text-white">အကောင့်ဝင်ရန် (Login)</h1>
+                <h1 class="text-lg font-bold text-white" data-i18n="loginTitle">အကောင့်ဝင်ရန် (Login)</h1>
                 <p class="text-xs text-gray-400 mt-0.5">Game & Billiards Timer</p>
             </div>
             <div class="space-y-3 text-left text-xs">
                 <div>
-                    <label class="text-gray-400 block mb-1">အီးမေးလ် (Email)</label>
+                    <label class="text-gray-400 block mb-1" data-i18n="emailLabel">အီးမေးလ် (Email)</label>
                     <input type="email" id="authEmail" placeholder="owner@shop.com" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white outline-none">
                 </div>
                 <div>
-                    <label class="text-gray-400 block mb-1">စကားဝှက် (Password)</label>
+                    <label class="text-gray-400 block mb-1" data-i18n="passLabel">စကားဝှက် (Password)</label>
                     <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2.5 text-white outline-none">
                 </div>
             </div>
-            <button onclick="handleAuthSubmit()" class="w-full py-3 accent-btn text-xs font-bold text-white rounded-xl shadow-lg transition active:scale-95 cursor-pointer">အကောင့်ဝင်မည်</button>
+            <button onclick="handleAuthSubmit()" class="w-full py-3 accent-btn text-xs font-bold text-white rounded-xl shadow-lg transition active:scale-95 cursor-pointer" data-i18n="loginBtn">အကောင့်ဝင်မည်</button>
         </div>
     </div>
 
     <!-- MAIN HEADER -->
-    <header class="sticky top-0 z-30 glass-card border-b px-4 py-3.5 flex justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-2xl accent-btn flex items-center justify-center font-extrabold text-white text-lg">GBT</div>
-            <div>
-                <h1 class="text-lg font-bold tracking-wide" id="headerShopName">Game & Billiards Timer</h1>
-                <p class="text-[11px] accent-text font-medium">PS4: <span id="headerPsRate">၄,၀၀၀</span> | ဘိလိယက်: <span id="headerPoolRate">၅,၀၀၀</span></p>
-            </div>
+    <header class="sticky top-0 z-30 glass-card border-b px-4 py-3 flex justify-between items-center shadow-lg">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-xl accent-btn flex items-center justify-center font-extrabold text-white text-sm">GBT</div>
+            <h1 class="text-sm font-bold tracking-wide" id="headerShopName">Game & Billiards Timer</h1>
         </div>
         <div class="flex items-center gap-2">
-            <select onchange="changeLanguage(this.value)" id="langSelect" class="bg-slate-900/60 text-xs text-gray-300 border border-gray-800 rounded-xl px-2 py-2 outline-none cursor-pointer">
-                <option value="my">မြန်မာ</option>
-                <option value="en">English</option>
-            </select>
-            <select onchange="changeTheme(this.value)" id="themeSelect" class="bg-slate-900/60 text-xs text-gray-300 border border-gray-800 rounded-xl px-2 py-2 outline-none cursor-pointer">
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="emerald">Emerald</option>
-                <option value="ocean">Ocean</option>
-            </select>
-            <button onclick="openSettingsPrompt()" class="p-2.5 rounded-2xl glass-card text-gray-300 hover:text-white cursor-pointer"><i data-lucide="settings" class="w-5 h-5"></i></button>
-            <button onclick="logout()" class="p-2.5 rounded-2xl glass-card text-red-400 hover:text-red-300 cursor-pointer"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+            <button onclick="openSettingsModal()" class="p-2 rounded-xl glass-card text-gray-300 hover:text-white cursor-pointer flex items-center gap-1 text-xs">
+                <i data-lucide="sliders" class="w-4 h-4"></i> <span data-i18n="settingsNav">ဆက်တင်</span>
+            </button>
+            <button onclick="logout()" class="p-2 rounded-xl glass-card text-red-400 hover:text-red-300 cursor-pointer"><i data-lucide="log-out" class="w-4 h-4"></i></button>
         </div>
     </header>
 
     <!-- CONTENT -->
-    <main class="flex-grow container mx-auto px-4 py-6 max-w-5xl space-y-6">
+    <main class="flex-grow container mx-auto px-3 py-4 max-w-4xl space-y-5">
         
         <!-- TAB 1: PS4 STATIONS -->
-        <div id="tab-ps4" class="tab-content space-y-4">
-            <div class="flex justify-between items-center">
+        <div id="tab-ps4" class="tab-content space-y-3">
+            <div class="flex justify-between items-center px-1">
                 <div>
-                    <h2 class="text-md font-bold flex items-center gap-2"><i data-lucide="gamepad-2" class="accent-text"></i> PS4 ဂိမ်းစက်များ</h2>
-                    <p class="text-xs text-gray-400">စက်တစ်လုံးချင်းစီအလိုက် အချိန်နှင့် စားသုံးမှုများ</p>
+                    <h2 class="text-sm font-bold flex items-center gap-1.5"><i data-lucide="gamepad-2" class="accent-text w-4 h-4"></i> <span data-i18n="ps4Tab">PS4 ဂိမ်းစက်များ</span></h2>
                 </div>
-                <button onclick="addNewStation('ps4')" class="accent-btn text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"><i data-lucide="plus" class="w-4 h-4"></i> စက်အသစ်</button>
+                <button onclick="addNewStation('ps4')" class="accent-btn text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"><i data-lucide="plus" class="w-3.5 h-3.5"></i> <span data-i18n="newStation">စက်အသစ်</span></button>
             </div>
-            <div id="ps4Grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="ps4Grid" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
         </div>
 
         <!-- TAB 2: POOL -->
-        <div id="tab-pool" class="tab-content hidden space-y-4">
-            <div class="flex justify-between items-center">
+        <div id="tab-pool" class="tab-content hidden space-y-3">
+            <div class="flex justify-between items-center px-1">
                 <div>
-                    <h2 class="text-md font-bold flex items-center gap-2"><i data-lucide="circle-dot" class="accent-text"></i> ဘိလိယက်ခုံများ</h2>
-                    <p class="text-xs text-gray-400">နာရီအလိုက် (သို့) ပွဲစဉ်အလိုက် ရွေးချယ်နိုင်သည်</p>
+                    <h2 class="text-sm font-bold flex items-center gap-1.5"><i data-lucide="circle-dot" class="accent-text w-4 h-4"></i> <span data-i18n="poolTab">ဘိလိယက်ခုံများ</span></h2>
                 </div>
-                <button onclick="addNewStation('pool')" class="accent-btn text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"><i data-lucide="plus" class="w-4 h-4"></i> ခုံအသစ်</button>
+                <button onclick="addNewStation('pool')" class="accent-btn text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"><i data-lucide="plus" class="w-3.5 h-3.5"></i> <span data-i18n="newTable">ခုံအသစ်</span></button>
             </div>
-            <div id="poolGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="poolGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
         </div>
 
-        <!-- TAB 3: POS (Drinks, Snacks, Beer, Liquor, Cigarettes) -->
-        <div id="tab-pos" class="tab-content hidden space-y-4">
-            <div class="flex justify-between items-center">
+        <!-- TAB 3: POS -->
+        <div id="tab-pos" class="tab-content hidden space-y-3">
+            <div class="flex justify-between items-center px-1">
                 <div>
-                    <h2 class="text-md font-bold flex items-center gap-2"><i data-lucide="shopping-bag" class="accent-text"></i> မုန့်၊ အချိုရည်၊ ဘီယာ၊ အရက်နှင့် ဆေးလိပ် အရောင်းစနစ်</h2>
-                    <p class="text-xs text-gray-400">စက်/ခုံ သို့မဟုတ် ကောင်တာငွေရှင်းရန်</p>
+                    <h2 class="text-sm font-bold flex items-center gap-1.5"><i data-lucide="shopping-bag" class="accent-text w-4 h-4"></i> <span data-i18n="posTab">မုန့်နှင့် အဖျော်ယမကာများ</span></h2>
                 </div>
-                <button onclick="addNewProductPrompt()" class="accent-btn text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"><i data-lucide="plus" class="w-4 h-4"></i> ပစ္စည်းအသစ်</button>
+                <button onclick="addNewProductPrompt()" class="accent-btn text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer"><i data-lucide="plus" class="w-3.5 h-3.5"></i> <span data-i18n="newProduct">ပစ္စည်းအသစ်</span></button>
             </div>
             
-            <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 text-xs">
-                <button onclick="filterPosCategory('ALL')" id="posCat-ALL" class="px-3 py-1.5 rounded-xl font-semibold bg-indigo-600 text-white whitespace-nowrap cursor-pointer">အားလုံး</button>
-                <button onclick="filterPosCategory('DRINKS')" id="posCat-DRINKS" class="px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer">အချိုရည် (Drinks)</button>
-                <button onclick="filterPosCategory('SNACKS')" id="posCat-SNACKS" class="px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer">စားစရာ (Snacks)</button>
-                <button onclick="filterPosCategory('BEER')" id="posCat-BEER" class="px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer">ဘီယာ (Beer)</button>
-                <button onclick="filterPosCategory('LIQUOR')" id="posCat-LIQUOR" class="px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer">အရက် (Liquor)</button>
-                <button onclick="filterPosCategory('CIGARETTE')" id="posCat-CIGARETTE" class="px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer">ဆေးလိပ် (Cigarettes)</button>
+            <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
+                <button onclick="filterPosCategory('ALL')" id="posCat-ALL" class="px-2.5 py-1 rounded-lg font-semibold bg-indigo-600 text-white whitespace-nowrap cursor-pointer" data-i18n="catAll">အားလုံး</button>
+                <button onclick="filterPosCategory('DRINKS')" id="posCat-DRINKS" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer" data-i18n="catDrinks">အချိုရည်</button>
+                <button onclick="filterPosCategory('SNACKS')" id="posCat-SNACKS" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer" data-i18n="catSnacks">စားစရာ</button>
+                <button onclick="filterPosCategory('BEER')" id="posCat-BEER" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer" data-i18n="catBeer">ဘီယာ</button>
+                <button onclick="filterPosCategory('LIQUOR')" id="posCat-LIQUOR" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer" data-i18n="catLiquor">အရက်</button>
+                <button onclick="filterPosCategory('CIGARETTE')" id="posCat-CIGARETTE" class="px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer" data-i18n="catCig">ဆေးလိပ်</button>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="posGrid"></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5" id="posGrid"></div>
         </div>
 
         <!-- TAB 4: ANALYTICS -->
         <div id="tab-analytics" class="tab-content hidden space-y-4">
-            <div>
-                <h2 class="text-md font-bold flex items-center gap-2"><i data-lucide="bar-chart-3" class="accent-text"></i> ဝင်ငွေနှင့် အရောင်းစာရင်း (Analytics)</h2>
-                <p class="text-xs text-gray-400">တစ်နေ့တာ ဝင်ငွေအနှစ်ချုပ်</p>
+            <div class="px-1 flex justify-between items-center">
+                <h2 class="text-sm font-bold flex items-center gap-1.5"><i data-lucide="bar-chart-3" class="accent-text w-4 h-4"></i> <span data-i18n="analyticsTab">ဝင်ငွေနှင့် ဂရပ်များ</span></h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="glass-card p-5 rounded-2xl space-y-1">
-                    <div class="text-xs text-gray-400">စုစုပေါင်း ဝင်ငွေ (Total Revenue)</div>
-                    <div class="text-2xl font-bold accent-text" id="analyticsTotalRevenue">0 ကျပ်</div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="glass-card p-4 rounded-xl space-y-1">
+                    <div class="text-[11px] text-gray-400" data-i18n="totalRev">စုစုပေါင်း ဝင်ငွေ</div>
+                    <div class="text-xl font-bold accent-text" id="analyticsTotalRevenue">0 ကျပ်</div>
                 </div>
-                <div class="glass-card p-5 rounded-2xl space-y-1">
-                    <div class="text-xs text-gray-400">ဆော့ချိန် ရငွေ (Gaming Revenue)</div>
-                    <div class="text-xl font-bold text-emerald-400" id="analyticsGameRevenue">0 ကျပ်</div>
+                <div class="glass-card p-4 rounded-xl space-y-1">
+                    <div class="text-[11px] text-gray-400" data-i18n="gameRev">ဆော့ချိန် ရငွေ</div>
+                    <div class="text-lg font-bold text-emerald-400" id="analyticsGameRevenue">0 ကျပ်</div>
                 </div>
-                <div class="glass-card p-5 rounded-2xl space-y-1">
-                    <div class="text-xs text-gray-400">POS စားသောက်ကုန် ရငွေ (POS Revenue)</div>
-                    <div class="text-xl font-bold text-amber-400" id="analyticsPosRevenue">0 ကျပ်</div>
+                <div class="glass-card p-4 rounded-xl space-y-1">
+                    <div class="text-[11px] text-gray-400" data-i18n="posRev">POS စားသောက်ကုန် ရငွေ</div>
+                    <div class="text-lg font-bold text-amber-400" id="analyticsPosRevenue">0 ကျပ်</div>
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 5: USER GUIDE -->
-        <div id="tab-guide" class="tab-content hidden space-y-4">
-            <div>
-                <h2 class="text-md font-bold flex items-center gap-2"><i data-lucide="book-open" class="accent-text"></i> အသုံးပြုပုံ အသေးစိတ် လမ်းညွှန် (User Guide)</h2>
-                <p class="text-xs text-gray-400">ဆိုင်ရှင်နှင့် ဝန်ထမ်းများအတွက် ရှင်းလင်းချက်များ</p>
-            </div>
-            <div class="glass-card p-5 rounded-2xl space-y-3 text-xs text-gray-300 leading-relaxed">
-                <div class="font-bold text-sm text-white">၁။ Home Screen တွင် App အဖြစ် အသုံးပြုခြင်း</div>
-                <p>- ဖုန်းဘရောက်ဆာ (Safari / Chrome) မီနူးမှတဆင့် "Add to Home Screen" ကိုနှိပ်၍ အက်ပ်ကဲ့သို့ လွယ်ကူစွာ အသုံးပြုနိုင်ပါသည်။</p>
-                <div class="font-bold text-sm text-white pt-2">၂။ ဘီယာနှင့် အရက် (Liquor) Category များ</div>
-                <p>- POS စနစ်တွင် ဘီယာအပြင် အရက်အမျိုးအစားများကိုပါ သီးသန့်ရွေးချယ် တွက်ချက်နိုင်ပါသည်။</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-card p-4 rounded-2xl space-y-2">
+                    <h3 class="text-xs font-bold text-gray-300" data-i18n="peakHoursTitle">နာရီအလိုက် လူစည်ကားမှု (Peak Hours)</h3>
+                    <div class="h-48 relative"><canvas id="hourlyChart"></canvas></div>
+                </div>
+                <div class="glass-card p-4 rounded-2xl space-y-2">
+                    <h3 class="text-xs font-bold text-gray-300" data-i18n="weeklyTrendTitle">တစ်ပတ်အတွင်း ဝင်ငွေနှုန်း (Weekly Trend)</h3>
+                    <div class="h-48 relative"><canvas id="weeklyChart"></canvas></div>
+                </div>
             </div>
         </div>
 
@@ -248,41 +234,134 @@
 
     <!-- BOTTOM NAV -->
     <nav class="fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-gray-800/80 px-2 py-2 bg-opacity-95 backdrop-blur-md">
-        <div class="max-w-lg mx-auto flex justify-between items-center text-[10px]">
-            <button onclick="switchTab('ps4')" id="nav-ps4" class="nav-item flex flex-col items-center gap-1 text-indigo-400 cursor-pointer"><i data-lucide="gamepad-2" class="w-5 h-5"></i><span>PS4 ဂိမ်း</span></button>
-            <button onclick="switchTab('pool')" id="nav-pool" class="nav-item flex flex-col items-center gap-1 text-gray-500 cursor-pointer"><i data-lucide="circle-dot" class="w-5 h-5"></i><span>ဘိလိယက်</span></button>
-            <button onclick="switchTab('pos')" id="nav-pos" class="nav-item flex flex-col items-center gap-1 text-gray-500 cursor-pointer"><i data-lucide="shopping-bag" class="w-5 h-5"></i><span>မုန့်/ဘီယာ</span></button>
-            <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-item flex flex-col items-center gap-1 text-gray-500 cursor-pointer"><i data-lucide="bar-chart-3" class="w-5 h-5"></i><span>ဝင်ငွေစာရင်း</span></button>
-            <button onclick="switchTab('guide')" id="nav-guide" class="nav-item flex flex-col items-center gap-1 text-gray-500 cursor-pointer"><i data-lucide="book-open" class="w-5 h-5"></i><span>လမ်းညွှန်</span></button>
+        <div class="max-w-md mx-auto flex justify-around items-center text-[11px]">
+            <button onclick="switchTab('ps4')" id="nav-ps4" class="nav-item flex flex-col items-center gap-0.5 text-indigo-400 cursor-pointer"><i data-lucide="gamepad-2" class="w-4 h-4"></i><span data-i18n="ps4Tab">PS4 ဂိမ်း</span></button>
+            <button onclick="switchTab('pool')" id="nav-pool" class="nav-item flex flex-col items-center gap-0.5 text-gray-500 cursor-pointer"><i data-lucide="circle-dot" class="w-4 h-4"></i><span data-i18n="poolTab">ဘိလိယက်</span></button>
+            <button onclick="switchTab('pos')" id="nav-pos" class="nav-item flex flex-col items-center gap-0.5 text-gray-500 cursor-pointer"><i data-lucide="shopping-bag" class="w-4 h-4"></i><span data-i18n="posTab">မုန့်/ဘီယာ</span></button>
+            <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-item flex flex-col items-center gap-0.5 text-gray-500 cursor-pointer"><i data-lucide="bar-chart-3" class="w-4 h-4"></i><span data-i18n="analyticsTab">ဝင်ငွေစာရင်း</span></button>
         </div>
     </nav>
 
+    <!-- CHECKOUT SUMMARY MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-2xl border border-indigo-500/30">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2.5">
+                <h3 class="font-bold text-sm text-white flex items-center gap-1.5"><i data-lucide="receipt" class="accent-text w-4 h-4"></i> <span id="checkoutTitle">ငွေရှင်းရန် စာရင်း</span></h3>
+                <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+
+            <!-- Receipt Breakdown -->
+            <div class="space-y-3 text-xs bg-slate-950/50 p-3.5 rounded-xl border border-gray-800">
+                <div class="flex justify-between text-gray-400">
+                    <span>စတင်ချိန် (Start Time):</span>
+                    <span id="checkoutStartTime" class="text-amber-400 font-semibold">--:--</span>
+                </div>
+                <div class="flex justify-between text-gray-300">
+                    <span>ဆော့ကစားချိန် ကျသင့်ငွေ:</span>
+                    <span id="checkoutTimeCost" class="font-bold text-white">0 ကျပ်</span>
+                </div>
+                
+                <div id="checkoutOrdersContainer" class="border-t border-gray-800/80 pt-2 space-y-1">
+                    <div class="text-[10px] text-gray-400 font-semibold mb-1">မှာယူထားသော စားသောက်ကုန်များ:</div>
+                    <div id="checkoutOrdersList" class="space-y-1 text-gray-300 max-h-28 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="border-t border-gray-700 pt-2.5 flex justify-between items-center text-sm font-bold">
+                    <span class="text-white">စုစုပေါင်း ကျသင့်ငွေ:</span>
+                    <span id="checkoutGrandTotal" class="accent-text text-base">0 ကျပ်</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-1">
+                <button onclick="confirmCheckout(false)" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5 text-indigo-400"></i> ရိုးရိုးရှင်းမည်
+                </button>
+                <button onclick="confirmCheckout(true)" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg transition cursor-pointer flex items-center justify-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Printer ဖြင့် ရိုက်မည်
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ITEM ORDER MODAL -->
     <div id="orderModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-md rounded-2xl p-5 space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-sm text-white">ပစ္စည်း/မုန့် မှာယူမည်</h3>
-                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x"></i></button>
+        <div class="glass-card w-full max-w-sm rounded-2xl p-4 space-y-3">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2.5">
+                <h3 class="font-bold text-xs text-white" data-i18n="orderModalTitle">ပစ္စည်း/မုန့် မှာယူမည်</h3>
+                <button onclick="closeOrderModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto" id="modalProductGrid"></div>
+            <div class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto" id="modalProductGrid"></div>
         </div>
     </div>
 
     <!-- SETTINGS MODAL -->
     <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+        <div class="glass-card w-full max-w-lg rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h3 class="font-bold text-md flex items-center gap-2"><i data-lucide="sliders" class="accent-text"></i> ဆိုင်ဆက်တင်များ</h3>
-                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x"></i></button>
+                <h3 class="font-bold text-sm flex items-center gap-2"><i data-lucide="sliders" class="accent-text w-4 h-4"></i> <span data-i18n="settingsTitle">ဆက်တင်များနှင့် လမ်းညွှန်</span></h3>
+                <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            <div class="space-y-3 text-xs">
-                <div><label class="text-gray-400 block mb-1">ဆိုင်အမည်</label><input type="text" id="settingShopName" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
+
+            <!-- Settings Form -->
+            <div class="space-y-3 text-xs border-b border-gray-800 pb-4">
+                <div class="font-bold text-white text-xs flex items-center gap-1"><i data-lucide="settings" class="w-3.5 h-3.5 accent-text"></i> <span data-i18n="secRateTitle">၁။ ဆိုင်နှုန်းထားများနှင့် ဘာသာစကား</span></div>
+                <div><label class="text-gray-400 block mb-1" data-i18n="shopNameLbl">ဆိုင်အမည်</label><input type="text" id="settingShopName" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="text-gray-400 block mb-1">PS4 ၁ နာရီ (ကျပ်)</label><input type="number" id="settingPsRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
-                    <div><label class="text-gray-400 block mb-1">ဘိလိယက် ၁ နာရီ (ကျပ်)</label><input type="number" id="settingPoolRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
+                    <div><label class="text-gray-400 block mb-1" data-i18n="psRateLbl">PS4 ၁ နာရီ (ကျပ်)</label><input type="number" id="settingPsRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
+                    <div><label class="text-gray-400 block mb-1" data-i18n="poolRateLbl">ဘိလိယက် ၁ နာရီ (ကျပ်)</label><input type="number" id="settingPoolRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
                 </div>
-                <div><label class="text-gray-400 block mb-1">ဘိလိယက် ၁ ပွဲ နှုန်းထား (ကျပ်)</label><input type="number" id="settingGameRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
-                <button onclick="saveSettings()" class="w-full py-2.5 accent-btn text-xs font-bold text-white rounded-xl cursor-pointer">ဆက်တင်များ သိမ်းဆည်းမည်</button>
+                <div><label class="text-gray-400 block mb-1" data-i18n="poolGameRateLbl">ဘိလိယက် ၁ ပွဲ နှုန်းထား (ကျပ်)</label><input type="number" id="settingGameRate" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-gray-400 block mb-1" data-i18n="langLbl">ဘာသာစကား (Language)</label>
+                        <select onchange="changeLanguage(this.value)" id="langSelect" class="w-full bg-slate-900/50 text-xs text-gray-300 border border-gray-800 rounded-xl px-3 py-2 outline-none cursor-pointer">
+                            <option value="my">မြန်မာ (Myanmar)</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 block mb-1" data-i18n="themeLbl">အပြင်အဆင် (Theme)</label>
+                        <select onchange="changeTheme(this.value)" id="themeSelect" class="w-full bg-slate-900/50 text-xs text-gray-300 border border-gray-800 rounded-xl px-3 py-2 outline-none cursor-pointer">
+                            <option value="dark">Dark</option>
+                            <option value="light">Light</option>
+                            <option value="emerald">Emerald</option>
+                            <option value="ocean">Ocean</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <button onclick="connectBluetoothPrinter()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white rounded-xl shadow cursor-pointer flex items-center justify-center gap-1.5">
+                        <i data-lucide="printer" class="w-4 h-4"></i> <span data-i18n="btPrinterBtn">Bluetooth ပရင်တာ ချိတ်ဆက်ရန်</span>
+                    </button>
+                </div>
+
+                <button onclick="saveSettings()" class="w-full py-2.5 accent-btn text-xs font-bold text-white rounded-xl cursor-pointer" data-i18n="saveSettingsBtn">ဆက်တင်များ သိမ်းဆည်းမည်</button>
+            </div>
+
+            <!-- CATEGORIZED USER GUIDE -->
+            <div class="space-y-3 text-xs text-gray-300 leading-relaxed pt-1">
+                <div class="font-bold text-white text-xs flex items-center gap-1 border-b border-gray-800 pb-1">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5 accent-text"></i> <span>၂။ အသုံးပြုပုံ အသေးစိတ် လမ်းညွှန်ချက်များ</span>
+                </div>
+
+                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
+                    <div class="font-bold text-indigo-400 flex items-center gap-1">🎮 ၁။ PlayStation ဂိမ်းစက်များ အသုံးပြုပုံ</div>
+                    <p>• <b>စက်အသစ်ထည့်ခြင်း:</b> ညာဘက်အပေါ်ရှိ "+ စက်အသစ်" ခလုတ်ကို နှိပ်ပါ။</p>
+                    <p>• <b>စတင်ချိန်သက်သေ:</b> "စတင်" (Start) နှိပ်လိုက်ပါက စတင်သည့်အချိန် (Start Time) ကို ကတ်ပြားပေါ်တွင် သက်သေအဖြစ် အတိအကျ ပြသပေးပါသည်။</p>
+                </div>
+
+                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
+                    <div class="font-bold text-amber-400 flex items-center gap-1">🎱 ၂။ ဘိလိယက်ခုံများ အသုံးပြုပုံ</div>
+                    <p>• <b>မုဒ်ပြောင်းလဲခြင်း:</b> "နာရီ" သို့မဟုတ် "ပွဲစဉ်" ခလုတ်ကို နှိပ်၍ မုဒ်ပြောင်းနိုင်ပါသည်။</p>
+                </div>
+
+                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
+                    <div class="font-bold text-emerald-400 flex items-center gap-1">🖨️ ၃။ Bluetooth & Printer အသုံးပြုပုံ</div>
+                    <p>• <b>Printer ဖြင့် ငွေရှင်းခြင်း:</b> "ရှင်းမည်" ခလုတ်ကို နှိပ်လိုက်ပါက စုစုပေါင်း စာရင်းအကျဉ်းချုပ် ပေါ်လာမည်ဖြစ်ပြီး Printer ဖြင့် ရိုက်မည် သို့မဟုတ် ရိုးရိုးရှင်းမည် ရွေးချယ်နိုင်ပါသည်။</p>
+                </div>
             </div>
         </div>
     </div>
@@ -298,13 +377,18 @@
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        let currentLang = 'my';
         let activePosCategory = 'ALL';
         let currentSelectingTarget = null;
+        let currentCheckoutTarget = null;
         let totalRevenueToday = 0;
         let gameRevenueToday = 0;
         let posRevenueToday = 0;
+        let weeklyData = [0, 0, 0, 0, 0, 0, 0];
+        let hourlyChartInstance = null;
+        let weeklyChartInstance = null;
+        let bluetoothDevice = null;
 
         let appState = {
             shopName: "Game & Billiards Timer",
@@ -312,6 +396,7 @@
             poolRate: 5000,
             poolGameRate: 1500,
             theme: "dark",
+            lang: "my",
             ps4Stations: [
                 { id: 101, name: "TV - 1 (PS4)", status: 'IDLE', elapsedSeconds: 0, startTime: null, orders: [] }
             ],
@@ -324,30 +409,152 @@
                 { id: 3, name: "Myanmar Beer", price: 3500, category: "BEER" },
                 { id: 4, name: "Black Special Whisky", price: 15000, category: "LIQUOR" },
                 { id: 5, name: "Red Ruby ဆေးလိပ်", price: 2500, category: "CIGARETTE" }
-            ],
-            debts: []
+            ]
+        };
+
+        const translations = {
+            my: {
+                loginTitle: "အကောင့်ဝင်ရန် (Login)",
+                emailLabel: "အီးမေးလ် (Email)",
+                passLabel: "စကားဝှက် (Password)",
+                loginBtn: "အကောင့်ဝင်မည်",
+                settingsNav: "ဆက်တင်",
+                ps4Tab: "PS4 ဂိမ်းစက်များ",
+                poolTab: "ဘိလိယက်ခုံများ",
+                posTab: "မုန့်နှင့် အဖျော်ယမကာများ",
+                analyticsTab: "ဝင်ငွေနှင့် ဂရပ်များ",
+                newStation: "စက်အသစ်",
+                newTable: "ခုံအသစ်",
+                newProduct: "ပစ္စည်းအသစ်",
+                catAll: "အားလုံး",
+                catDrinks: "အချိုရည်",
+                catSnacks: "စားစရာ",
+                catBeer: "ဘီယာ",
+                catLiquor: "အရက်",
+                catCig: "ဆေးလိပ်",
+                totalRev: "စုစုပေါင်း ဝင်ငွေ",
+                gameRev: "ဆော့ချိန် ရငွေ",
+                posRev: "POS စားသောက်ကုန် ရငွေ",
+                peakHoursTitle: "နာရီအလိုက် လူစည်ကားမှု (Peak Hours)",
+                weeklyTrendTitle: "တစ်ပတ်အတွင်း ဝင်ငွေနှုန်း (Weekly Trend)",
+                orderModalTitle: "ပစ္စည်း/မုန့် မှာယူမည်",
+                settingsTitle: "ဆက်တင်များနှင့် လမ်းညွှန်",
+                secRateTitle: "၁။ ဆိုင်နှုန်းထားများနှင့် ဘာသာစကား",
+                shopNameLbl: "ဆိုင်အမည်",
+                psRateLbl: "PS4 ၁ နာရီ (ကျပ်)",
+                poolRateLbl: "ဘိလိယက် ၁ နာရီ (ကျပ်)",
+                poolGameRateLbl: "ဘိလိယက် ၁ ပွဲ နှုန်းထား (ကျပ်)",
+                langLbl: "ဘာသာစကား (Language)",
+                themeLbl: "အပြင်အဆင် (Theme)",
+                btPrinterBtn: "Bluetooth ပရင်တာ ချိတ်ဆက်ရန်",
+                saveSettingsBtn: "ဆက်တင်များ သိမ်းဆည်းမည်"
+            },
+            en: {
+                loginTitle: "Login to Account",
+                emailLabel: "Email Address",
+                passLabel: "Password",
+                loginBtn: "Sign In",
+                settingsNav: "Settings",
+                ps4Tab: "PS4 Stations",
+                poolTab: "Billiards Tables",
+                posTab: "POS & Drinks",
+                analyticsTab: "Analytics & Charts",
+                newStation: "New Station",
+                newTable: "New Table",
+                newProduct: "New Item",
+                catAll: "All",
+                catDrinks: "Drinks",
+                catSnacks: "Snacks",
+                catBeer: "Beer",
+                catLiquor: "Liquor",
+                catCig: "Cigarettes",
+                totalRev: "Total Revenue",
+                gameRev: "Gaming Revenue",
+                posRev: "POS Revenue",
+                peakHoursTitle: "Hourly Peak Hours",
+                weeklyTrendTitle: "Weekly Revenue Trend",
+                orderModalTitle: "Order Product / Snack",
+                settingsTitle: "Settings & Guide",
+                secRateTitle: "1. Shop Rates & Language",
+                shopNameLbl: "Shop Name",
+                psRateLbl: "PS4 1 Hour (MMK)",
+                poolRateLbl: "Pool 1 Hour (MMK)",
+                poolGameRateLbl: "Pool Per Game (MMK)",
+                langLbl: "Language",
+                themeLbl: "Color Theme",
+                btPrinterBtn: "Connect Bluetooth Printer",
+                saveSettingsBtn: "Save Settings"
+            }
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            loadFromLocalStorage();
             lucide.createIcons();
             setInterval(updateLiveTimers, 1000);
+            initCharts();
 
             auth.onAuthStateChanged(user => {
                 if (user) {
                     document.getElementById("authOverlay").classList.add("hidden");
-                    updateHeaderUI();
-                    renderAllGrids();
+                    loadFromCloud();
                 } else {
                     document.getElementById("authOverlay").classList.remove("hidden");
                 }
             });
         });
 
+        function changeLanguage(lang) {
+            appState.lang = lang;
+            applyTranslations();
+            saveToCloud();
+        }
+
+        function applyTranslations() {
+            const t = translations[appState.lang] || translations.my;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.getAttribute("data-i18n");
+                if(t[key]) el.innerText = t[key];
+            });
+            document.getElementById("langSelect").value = appState.lang;
+        }
+
+        function initCharts() {
+            const ctxHourly = document.getElementById('hourlyChart').getContext('2d');
+            hourlyChartInstance = new Chart(ctxHourly, {
+                type: 'bar',
+                data: {
+                    labels: ['12AM', '3AM', '6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [0, 0, 0, 10000, 25000, 45000, 80000, 60000],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            const ctxWeekly = document.getElementById('weeklyChart').getContext('2d');
+            weeklyChartInstance = new Chart(ctxWeekly, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Weekly Trend',
+                        data: weeklyData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
         function changeTheme(themeName) {
             document.documentElement.setAttribute('data-theme', themeName);
             appState.theme = themeName;
-            saveToLocalStorage();
+            saveToCloud();
         }
 
         async function handleAuthSubmit() {
@@ -377,7 +584,11 @@
                 activeNav.classList.remove("text-gray-500");
                 activeNav.classList.add("text-indigo-400");
             }
-            if(tabId === 'analytics') updateAnalyticsUI();
+            if(tabId === 'analytics') {
+                updateAnalyticsUI();
+                if(hourlyChartInstance) hourlyChartInstance.update();
+                if(weeklyChartInstance) weeklyChartInstance.update();
+            }
         }
 
         function renderAllGrids() {
@@ -394,26 +605,26 @@
                 let timeCost = Math.ceil((item.elapsedSeconds / 3600) * appState.ps4Rate);
                 let orderTotal = item.orders.reduce((sum, o) => sum + (o.price * o.qty), 0);
                 let totalCost = timeCost + orderTotal;
-
-                let ordersHtml = item.orders.map(o => `<div class="flex justify-between text-[11px] text-gray-300"><span>• ${o.name} (x${o.qty})</span><span>${(o.price * o.qty).toLocaleString()} ကျပ်</span></div>`).join('');
+                let ordersCount = item.orders.reduce((sum, o) => sum + o.qty, 0);
 
                 container.innerHTML += `
-                    <div class="glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3 ${item.status === 'RUNNING' ? 'active-glow border-emerald-500/50' : ''}">
-                        <div class="flex justify-between items-center"><span class="font-bold text-sm">${item.name}</span><span class="text-[10px] px-2 py-0.5 rounded-full ${item.status === 'RUNNING' ? 'bg-emerald-950 text-emerald-400' : 'bg-slate-800 text-gray-400'}">${item.status}</span></div>
-                        <div class="text-center py-2 bg-slate-950/40 rounded-xl border border-gray-800 space-y-0.5">
-                            <div class="text-xl font-mono font-bold">${formatTime(item.elapsedSeconds)}</div>
-                            <div class="text-[10px] text-gray-400">စတင်ချိန်: <span class="text-indigo-300 font-medium">${item.startTime || '-'}</span> | စုစုပေါင်း: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
+                    <div class="glass-card rounded-xl p-3 flex flex-col justify-between space-y-2.5 ${item.status === 'RUNNING' ? 'active-glow border-emerald-500/50' : ''}">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-xs truncate max-w-[100px]">${item.name}</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded-full ${item.status === 'RUNNING' ? 'bg-emerald-950 text-emerald-400' : 'bg-slate-800 text-gray-400'}">${item.status}</span>
                         </div>
-                        <div class="space-y-1 bg-slate-950/30 p-2 rounded-lg max-h-24 overflow-y-auto">
-                            <div class="flex justify-between items-center text-[10px] text-indigo-400 font-bold">
-                                <span>စားသုံးမှုမှတ်တမ်း</span>
-                                <button onclick="openOrderModal('ps4', ${item.id})" title="မုန့်/ပစ္စည်းထည့်ရန်" class="p-1 rounded-md bg-indigo-600/30 hover:bg-indigo-600 text-white cursor-pointer flex items-center justify-center"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i></button>
-                            </div>
-                            ${ordersHtml || '<div class="text-[10px] text-gray-500">ပစ္စည်းမှာယူထားခြင်း မရှိပါ။</div>'}
+                        <div class="text-center py-1.5 bg-slate-950/40 rounded-lg border border-gray-800 space-y-0.5">
+                            <div class="text-base font-mono font-bold">${formatTime(item.elapsedSeconds)}</div>
+                            <div class="text-[9px] text-amber-400 font-semibold">Start: ${item.startTime ? item.startTime : '--:--'}</div>
+                            <div class="text-[9px] text-gray-400">Total: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="toggleTimer('ps4', ${item.id})" class="py-1.5 ${item.status === 'RUNNING' ? 'bg-amber-600' : 'bg-emerald-600'} text-white rounded-lg text-xs font-semibold cursor-pointer">${item.status === 'RUNNING' ? 'ခေတ္တရပ်' : 'စတင်မည်'}</button>
-                            <button onclick="resetItem('ps4', ${item.id})" class="py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">ဘောက်ချာရှင်း</button>
+                        <div class="flex justify-between items-center text-[10px] bg-slate-950/30 px-2 py-1 rounded-lg">
+                            <span class="text-gray-300">Items (${ordersCount})</span>
+                            <button onclick="openOrderModal('ps4', ${item.id})" class="p-1 rounded bg-indigo-600/30 hover:bg-indigo-600 text-white cursor-pointer"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="toggleTimer('ps4', ${item.id})" class="py-1.5 ${item.status === 'RUNNING' ? 'bg-amber-600' : 'bg-emerald-600'} text-white rounded-lg text-[10px] font-semibold cursor-pointer">${item.status === 'RUNNING' ? 'Stop' : 'Start'}</button>
+                            <button onclick="openCheckoutModal('ps4', ${item.id})" class="py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold cursor-pointer flex items-center justify-center gap-1"><i data-lucide="receipt" class="w-3 h-3"></i> ရှင်းမည်</button>
                         </div>
                     </div>
                 `;
@@ -428,49 +639,120 @@
                 let timeCost = item.mode === 'TIMER' ? Math.ceil((item.elapsedSeconds / 3600) * appState.poolRate) : (item.gamesPlayed * appState.poolGameRate);
                 let orderTotal = item.orders.reduce((sum, o) => sum + (o.price * o.qty), 0);
                 let totalCost = timeCost + orderTotal;
-
-                let ordersHtml = item.orders.map(o => `<div class="flex justify-between text-[11px] text-gray-300"><span>• ${o.name} (x${o.qty})</span><span>${(o.price * o.qty).toLocaleString()} ကျပ်</span></div>`).join('');
+                let ordersCount = item.orders.reduce((sum, o) => sum + o.qty, 0);
 
                 let modeIconBtn = item.mode === 'TIMER' 
-                    ? `<button onclick="togglePoolMode(${item.id})" title="နာရီအလိုက် (ပြောင်းရန်နှိပ်ပါ)" class="p-1.5 rounded-lg bg-indigo-950/80 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-900 cursor-pointer flex items-center gap-1 text-[10px]"><i data-lucide="clock" class="w-3.5 h-3.5"></i> နာရီအလိုက်</button>`
-                    : `<button onclick="togglePoolMode(${item.id})" title="ပွဲစဉ်အလိုက် (ပြောင်းရန်နှိပ်ပါ)" class="p-1.5 rounded-lg bg-amber-950/80 text-amber-400 border border-amber-500/30 hover:bg-amber-900 cursor-pointer flex items-center gap-1 text-[10px]"><i data-lucide="trophy" class="w-3.5 h-3.5"></i> ပွဲစဉ်အလိုက်</button>`;
+                    ? `<button onclick="togglePoolMode(${item.id})" class="p-1 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30 cursor-pointer text-[9px]">Timer</button>`
+                    : `<button onclick="togglePoolMode(${item.id})" class="p-1 rounded bg-amber-950/80 text-amber-400 border border-amber-500/30 cursor-pointer text-[9px]">Games</button>`;
 
                 container.innerHTML += `
-                    <div class="glass-card rounded-2xl p-4 flex flex-col justify-between space-y-3 ${item.status === 'RUNNING' ? 'active-glow border-emerald-500/50' : ''}">
+                    <div class="glass-card rounded-xl p-3 flex flex-col justify-between space-y-2.5 ${item.status === 'RUNNING' ? 'active-glow border-emerald-500/50' : ''}">
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-sm">${item.name}</span>
+                            <span class="font-bold text-xs truncate max-w-[80px]">${item.name}</span>
                             ${modeIconBtn}
                         </div>
 
                         ${item.mode === 'TIMER' ? `
-                            <div class="text-center py-2 bg-slate-950/40 rounded-xl border border-gray-800 space-y-0.5">
-                                <div class="text-xl font-mono font-bold">${formatTime(item.elapsedSeconds)}</div>
-                                <div class="text-[10px] text-gray-400">စတင်ချိန်: <span class="text-indigo-300 font-medium">${item.startTime || '-'}</span> | စုစုပေါင်း: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
+                            <div class="text-center py-1.5 bg-slate-950/40 rounded-lg border border-gray-800 space-y-0.5">
+                                <div class="text-base font-mono font-bold">${formatTime(item.elapsedSeconds)}</div>
+                                <div class="text-[9px] text-amber-400 font-semibold">Start: ${item.startTime ? item.startTime : '--:--'}</div>
+                                <div class="text-[9px] text-gray-400">Total: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
                             </div>
                         ` : `
-                            <div class="text-center py-2 bg-slate-950/40 rounded-xl border border-gray-800 space-y-1">
-                                <div class="text-lg font-bold text-amber-400">${item.gamesPlayed} ပွဲကစားပြီး</div>
-                                <div class="text-[10px] text-gray-400">စတင်ချိန်: <span class="text-indigo-300 font-medium">${item.startTime || '-'}</span> | စုစုပေါင်း: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
-                                <button onclick="addPoolGame(${item.id})" class="mt-0.5 px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg cursor-pointer">+ ပွဲစဉ် ၁ ပွဲတိုး</button>
+                            <div class="text-center py-1 bg-slate-950/40 rounded-lg border border-gray-800 space-y-0.5">
+                                <div class="text-xs font-bold text-amber-400">${item.gamesPlayed} Games</div>
+                                <div class="text-[9px] text-gray-400">Total: <span class="accent-text font-semibold">${totalCost.toLocaleString()} ကျပ်</span></div>
+                                <button onclick="addPoolGame(${item.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-bold rounded cursor-pointer">+1 Game</button>
                             </div>
                         `}
 
-                        <div class="space-y-1 bg-slate-950/30 p-2 rounded-lg max-h-24 overflow-y-auto">
-                            <div class="flex justify-between items-center text-[10px] text-indigo-400 font-bold">
-                                <span>စားသုံးမှုမှတ်တမ်း</span>
-                                <button onclick="openOrderModal('pool', ${item.id})" title="မုန့်/ပစ္စည်းထည့်ရန်" class="p-1 rounded-md bg-indigo-600/30 hover:bg-indigo-600 text-white cursor-pointer flex items-center justify-center"><i data-lucide="plus-circle" class="w-3.5 h-3.5"></i></button>
-                            </div>
-                            ${ordersHtml || '<div class="text-[10px] text-gray-500">ပစ္စည်းမှာယူထားခြင်း မရှိပါ။</div>'}
+                        <div class="flex justify-between items-center text-[10px] bg-slate-950/30 px-2 py-1 rounded-lg">
+                            <span class="text-gray-300">Items (${ordersCount})</span>
+                            <button onclick="openOrderModal('pool', ${item.id})" class="p-1 rounded bg-indigo-600/30 hover:bg-indigo-600 text-white cursor-pointer"><i data-lucide="plus" class="w-3 h-3"></i></button>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="togglePoolTimer(${item.id})" class="py-1.5 ${item.status === 'RUNNING' ? 'bg-amber-600' : 'bg-emerald-600'} text-white rounded-lg text-xs font-semibold cursor-pointer">${item.status === 'RUNNING' ? 'ခေတ္တရပ်' : 'စတင်မည်'}</button>
-                            <button onclick="resetItem('pool', ${item.id})" class="py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer">ဘောက်ချာရှင်း</button>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="togglePoolTimer(${item.id})" class="py-1.5 ${item.status === 'RUNNING' ? 'bg-amber-600' : 'bg-emerald-600'} text-white rounded-lg text-[10px] font-semibold cursor-pointer">${item.status === 'RUNNING' ? 'Stop' : 'Start'}</button>
+                            <button onclick="openCheckoutModal('pool', ${item.id})" class="py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[10px] font-bold cursor-pointer flex items-center justify-center gap-1"><i data-lucide="receipt" class="w-3 h-3"></i> ရှင်းမည်</button>
                         </div>
                     </div>
                 `;
             });
             lucide.createIcons();
+        }
+
+        // --- CHECKOUT SUMMARY MODAL FUNCTIONS ---
+        function openCheckoutModal(type, id) {
+            const list = type === 'ps4' ? appState.ps4Stations : appState.poolTables;
+            let item = list.find(s => s.id === id);
+            if (!item) return;
+
+            let timeCost = 0;
+            if(type === 'ps4') {
+                timeCost = Math.ceil((item.elapsedSeconds / 3600) * appState.ps4Rate);
+            } else {
+                timeCost = item.mode === 'TIMER' ? Math.ceil((item.elapsedSeconds / 3600) * appState.poolRate) : (item.gamesPlayed * appState.poolGameRate);
+            }
+            let orderCost = item.orders.reduce((sum, o) => sum + (o.price * o.qty), 0);
+            let grandTotal = timeCost + orderCost;
+
+            currentCheckoutTarget = { type, id, item, timeCost, orderCost, grandTotal };
+
+            document.getElementById("checkoutTitle").innerText = `${item.name} - ငွေရှင်းရန် စာရင်း`;
+            document.getElementById("checkoutStartTime").innerText = item.startTime || 'မရှိပါ';
+            document.getElementById("checkoutTimeCost").innerText = timeCost.toLocaleString() + " ကျပ်";
+            document.getElementById("checkoutGrandTotal").innerText = grandTotal.toLocaleString() + " ကျပ်";
+
+            const ordersList = document.getElementById("checkoutOrdersList");
+            const ordersContainer = document.getElementById("checkoutOrdersContainer");
+            ordersList.innerHTML = "";
+
+            if (item.orders.length > 0) {
+                ordersContainer.classList.remove("hidden");
+                item.orders.forEach(o => {
+                    ordersList.innerHTML += `
+                        <div class="flex justify-between text-[11px]">
+                            <span>${o.name} (x${o.qty})</span>
+                            <span class="font-semibold text-white">${(o.price * o.qty).toLocaleString()} ကျပ်</span>
+                        </div>
+                    `;
+                });
+            } else {
+                ordersContainer.classList.add("hidden");
+            }
+
+            document.getElementById("checkoutModal").classList.remove("hidden");
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById("checkoutModal").classList.add("hidden");
+            currentCheckoutTarget = null;
+        }
+
+        function confirmCheckout(usePrinter) {
+            if (!currentCheckoutTarget) return;
+            const { item, timeCost, orderCost, grandTotal } = currentCheckoutTarget;
+
+            gameRevenueToday += timeCost;
+            posRevenueToday += orderCost;
+            totalRevenueToday = gameRevenueToday + posRevenueToday;
+
+            let dayIndex = new Date().getDay();
+            let adjustedDay = dayIndex === 0 ? 6 : dayIndex - 1;
+            weeklyData[adjustedDay] += grandTotal;
+
+            if (usePrinter) {
+                printViaBluetooth(item.name, timeCost, item.orders, grandTotal, item.startTime);
+            }
+
+            item.status = 'IDLE';
+            item.elapsedSeconds = 0;
+            item.gamesPlayed = 0;
+            item.startTime = null;
+            item.orders = [];
+
+            saveToCloud();
+            renderAllGrids();
+            closeCheckoutModal();
         }
 
         function togglePoolMode(id) {
@@ -481,7 +763,7 @@
                 item.elapsedSeconds = 0;
                 item.gamesPlayed = 0;
                 item.startTime = null;
-                saveToLocalStorage();
+                saveToCloud();
                 renderPoolGrid();
             }
         }
@@ -493,7 +775,7 @@
                 if(!item.startTime) {
                     item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
-                saveToLocalStorage();
+                saveToCloud();
                 renderPoolGrid();
             }
         }
@@ -510,7 +792,7 @@
                         item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
                 }
-                saveToLocalStorage();
+                saveToCloud();
                 renderPoolGrid();
             }
         }
@@ -521,10 +803,9 @@
             grid.innerHTML = "";
             appState.products.forEach(p => {
                 grid.innerHTML += `
-                    <div onclick="orderProductToStation(${p.id})" class="glass-card p-3 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition">
-                        <div class="font-bold text-xs">${p.name}</div>
-                        <div class="text-[10px] text-indigo-300">${p.category}</div>
-                        <div class="text-[10px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
+                    <div onclick="orderProductToStation(${p.id})" class="glass-card p-2.5 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition">
+                        <div class="font-bold text-[11px]">${p.name}</div>
+                        <div class="text-[9px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
                     </div>
                 `;
             });
@@ -546,7 +827,7 @@
                 let existing = item.orders.find(o => o.id === productId);
                 if (existing) { existing.qty += 1; } 
                 else { item.orders.push({ id: prod.id, name: prod.name, price: prod.price, qty: 1 }); }
-                saveToLocalStorage();
+                saveToCloud();
                 renderAllGrids();
                 closeOrderModal();
             }
@@ -556,7 +837,7 @@
             activePosCategory = cat;
             ['ALL', 'DRINKS', 'SNACKS', 'BEER', 'LIQUOR', 'CIGARETTE'].forEach(c => {
                 const btn = document.getElementById(`posCat-${c}`);
-                if(btn) btn.className = c === cat ? "px-3 py-1.5 rounded-xl font-semibold bg-indigo-600 text-white whitespace-nowrap cursor-pointer" : "px-3 py-1.5 rounded-xl font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer";
+                if(btn) btn.className = c === cat ? "px-2.5 py-1 rounded-lg font-semibold bg-indigo-600 text-white whitespace-nowrap cursor-pointer" : "px-2.5 py-1 rounded-lg font-semibold bg-slate-800 text-gray-300 whitespace-nowrap cursor-pointer";
             });
             renderPosProducts();
         }
@@ -567,10 +848,10 @@
             const filtered = activePosCategory === 'ALL' ? appState.products : appState.products.filter(p => p.category === activePosCategory);
             filtered.forEach(p => {
                 container.innerHTML += `
-                    <div class="glass-card p-4 rounded-2xl text-center space-y-1">
+                    <div class="glass-card p-3 rounded-xl text-center space-y-1">
                         <div class="font-bold text-xs">${p.name}</div>
-                        <div class="text-[10px] text-indigo-300">${p.category}</div>
-                        <div class="text-[11px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
+                        <div class="text-[9px] text-indigo-300">${p.category}</div>
+                        <div class="text-[10px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
                     </div>
                 `;
             });
@@ -579,10 +860,10 @@
         function addNewProductPrompt() {
             const name = prompt("ပစ္စည်း အမည်:");
             const price = parseFloat(prompt("ဈေးနှုန်း (ကျပ်):"));
-            const cat = prompt("Category ရွေးပါ (DRINKS / SNACKS / BEER / LIQUOR / CIGARETTE):", "BEER");
+            const cat = prompt("Category (DRINKS / SNACKS / BEER / LIQUOR / CIGARETTE):", "BEER");
             if (name && price) {
                 appState.products.push({ id: Date.now(), name, price, category: cat ? cat.toUpperCase() : 'SNACKS' });
-                saveToLocalStorage();
+                saveToCloud();
                 renderPosProducts();
             }
         }
@@ -593,7 +874,7 @@
                 const newItem = { id: Date.now(), name, status: 'IDLE', mode: 'TIMER', elapsedSeconds: 0, gamesPlayed: 0, startTime: null, orders: [] };
                 if (type === 'ps4') appState.ps4Stations.push(newItem);
                 else appState.poolTables.push(newItem);
-                saveToLocalStorage();
+                saveToCloud();
                 renderAllGrids();
             }
         }
@@ -611,34 +892,55 @@
                         item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
                 }
-                saveToLocalStorage();
+                saveToCloud();
                 renderAllGrids();
             }
         }
 
-        function resetItem(type, id) {
-            const list = type === 'ps4' ? appState.ps4Stations : appState.poolTables;
-            let item = list.find(s => s.id === id);
-            if (item && confirm("ဘောက်ချာရှင်းလင်းပြီး ငွေစာရင်းသို့ ထည့်သွင်းမည်လား?")) {
-                let timeCost = 0;
-                if(type === 'ps4') {
-                    timeCost = Math.ceil((item.elapsedSeconds / 3600) * appState.ps4Rate);
-                } else {
-                    timeCost = item.mode === 'TIMER' ? Math.ceil((item.elapsedSeconds / 3600) * appState.poolRate) : (item.gamesPlayed * appState.poolGameRate);
+        // --- REAL BLUETOOTH THERMAL PRINTER API ---
+        async function connectBluetoothPrinter() {
+            try {
+                if (!navigator.bluetooth) {
+                    alert("Your browser does not support Web Bluetooth.");
+                    return;
                 }
-                let orderCost = item.orders.reduce((sum, o) => sum + (o.price * o.qty), 0);
+                bluetoothDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+                });
+                alert("Bluetooth Printer Connected: " + bluetoothDevice.name);
+            } catch (error) {
+                alert("Bluetooth Connection Cancelled or Failed: " + error);
+            }
+        }
 
-                gameRevenueToday += timeCost;
-                posRevenueToday += orderCost;
-                totalRevenueToday = gameRevenueToday + posRevenueToday;
+        async function printViaBluetooth(stationName, timeCost, orders, total, startTime) {
+            let receipt = `=== ${appState.shopName} ===\n`;
+            receipt += `Station: ${stationName}\n`;
+            receipt += `Start Time: ${startTime || 'N/A'}\n`;
+            receipt += `Time Cost: ${timeCost} MMK\n`;
+            if(orders.length > 0) {
+                receipt += `--- Items ---\n`;
+                orders.forEach(o => { receipt += `${o.name} (x${o.qty}): ${o.price * o.qty} MMK\n`; });
+            }
+            receipt += `--------------------\n`;
+            receipt += `TOTAL: ${total} MMK\n`;
+            receipt += `Thank You!\n\n\n`;
 
-                item.status = 'IDLE';
-                item.elapsedSeconds = 0;
-                item.gamesPlayed = 0;
-                item.startTime = null;
-                item.orders = [];
-                saveToLocalStorage();
-                renderAllGrids();
+            if (bluetoothDevice && bluetoothDevice.gatt.connected) {
+                try {
+                    const server = await bluetoothDevice.gatt.connect();
+                    const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+                    const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+                    const encoder = new TextEncoder();
+                    await characteristic.writeValue(encoder.encode(receipt));
+                    alert("Receipt printed successfully!");
+                } catch(e) {
+                    console.log("Print error:", e);
+                }
+            } else {
+                console.log("Receipt Data:\n" + receipt);
+                alert("Receipt generated (Bluetooth printer option selected).");
             }
         }
 
@@ -666,11 +968,13 @@
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
-        function openSettingsPrompt() {
+        function openSettingsModal() {
             document.getElementById("settingShopName").value = appState.shopName;
             document.getElementById("settingPsRate").value = appState.ps4Rate;
             document.getElementById("settingPoolRate").value = appState.poolRate;
             document.getElementById("settingGameRate").value = appState.poolGameRate;
+            if(appState.theme) document.getElementById("themeSelect").value = appState.theme;
+            if(appState.lang) document.getElementById("langSelect").value = appState.lang;
             document.getElementById("settingsModal").classList.remove("hidden");
         }
 
@@ -681,41 +985,43 @@
             appState.ps4Rate = parseFloat(document.getElementById("settingPsRate").value) || appState.ps4Rate;
             appState.poolRate = parseFloat(document.getElementById("settingPoolRate").value) || appState.poolRate;
             appState.poolGameRate = parseFloat(document.getElementById("settingGameRate").value) || appState.poolGameRate;
-            saveToLocalStorage(); updateHeaderUI(); closeSettingsModal();
+            saveToCloud(); updateHeaderUI(); closeSettingsModal();
         }
 
         function updateHeaderUI() {
             document.getElementById("headerShopName").innerText = appState.shopName;
-            document.getElementById("headerPsRate").innerText = Number(appState.ps4Rate).toLocaleString();
-            document.getElementById("headerPoolRate").innerText = Number(appState.poolRate).toLocaleString();
         }
 
-        function saveToLocalStorage() { 
-            localStorage.setItem("tunkyi_final_saas", JSON.stringify(appState));
-            localStorage.setItem("tunkyi_rev_today", JSON.stringify({ totalRevenueToday, gameRevenueToday, posRevenueToday }));
+        function saveToCloud() {
+            const user = auth.currentUser;
+            if(!user) return;
+            db.collection("shops").doc(user.uid).set({
+                appState,
+                totalRevenueToday,
+                gameRevenueToday,
+                posRevenueToday,
+                weeklyData,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(err => console.log("Cloud Save Error:", err));
         }
 
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem("tunkyi_final_saas");
-            if (saved) { 
-                try { 
-                    appState = JSON.parse(saved); 
-                    if(appState.theme) {
-                        document.documentElement.setAttribute('data-theme', appState.theme);
-                        document.getElementById('themeSelect').value = appState.theme;
-                    }
-                } catch(e){} 
-            }
-            const revSaved = localStorage.getItem("tunkyi_rev_today");
-            if(revSaved) {
-                try {
-                    let r = JSON.parse(revSaved);
-                    totalRevenueToday = r.totalRevenueToday || 0;
-                    gameRevenueToday = r.gameRevenueToday || 0;
-                    posRevenueToday = r.posRevenueToday || 0;
-                } catch(e){}
-            }
-            updateHeaderUI();
+        function loadFromCloud() {
+            const user = auth.currentUser;
+            if(!user) return;
+            db.collection("shops").doc(user.uid).get().then(doc => {
+                if(doc.exists) {
+                    let data = doc.data();
+                    if(data.appState) appState = data.appState;
+                    totalRevenueToday = data.totalRevenueToday || 0;
+                    gameRevenueToday = data.gameRevenueToday || 0;
+                    posRevenueToday = data.posRevenueToday || 0;
+                    if(data.weeklyData) weeklyData = data.weeklyData;
+                    if(appState.theme) document.documentElement.setAttribute('data-theme', appState.theme);
+                    if(appState.lang) applyTranslations();
+                }
+                updateHeaderUI();
+                renderAllGrids();
+            }).catch(err => console.log("Cloud Load Error:", err));
         }
     </script>
 </body>
