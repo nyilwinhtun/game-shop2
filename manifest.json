@@ -1,7 +1,7 @@
 {
   "name": "Game & Billiards Timer",
   "short_name": "GBTimer",
-  "start_url": "./",
+  "start_url": "/game-timer/",
   "display": "standalone",
   "background_color": "#0b0f19",
   "theme_color": "#0b0f19",
