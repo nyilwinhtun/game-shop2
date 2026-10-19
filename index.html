@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game & Billiards Timer</title>
     
-    <!-- PWA Manifest & App Meta Tags -->
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{%22name%22:%22Game%20%26%20Billiards%20Timer%22,%22short_name%22:%22GBTimer%22,%22start_url%22:%22./%22,%22display%22:%22standalone%22,%22background_color%22:%22%230b0f19%22,%22theme_color%22:%22%230b0f19%22,%22icons%22:[{%22src%22:%22https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop%22,%22sizes%22:%22192x192%22,%22type%22:%22image/jpeg%22},{%22src%22:%22https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop%22,%22sizes%22:%22512x512%22,%22type%22:%22image/jpeg%22}]}">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Game and Billiards Timer","short_name":"GBTimer","start_url":".","display":"standalone","background_color":"%230b0f19","theme_color":"%230b0f19","icons":[{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=192&h=192&fit=crop","sizes":"192x192","type":"image/jpeg"},{"src":"https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=512&h=512&fit=crop","sizes":"512x512","type":"image/jpeg"}]}'>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Game & Billiards Timer">
@@ -250,7 +250,6 @@
                 <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <!-- Receipt Breakdown -->
             <div class="space-y-3 text-xs bg-slate-950/50 p-3.5 rounded-xl border border-gray-800">
                 <div class="flex justify-between text-gray-400">
                     <span>စတင်ချိန် (Start Time):</span>
@@ -272,7 +271,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div class="grid grid-cols-2 gap-2 pt-1">
                 <button onclick="confirmCheckout(false)" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1">
                     <i data-lucide="check-circle" class="w-3.5 h-3.5 text-indigo-400"></i> ရိုးရိုးရှင်းမည်
@@ -303,7 +301,6 @@
                 <button onclick="closeSettingsModal()" class="text-gray-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
 
-            <!-- Settings Form -->
             <div class="space-y-3 text-xs border-b border-gray-800 pb-4">
                 <div class="font-bold text-white text-xs flex items-center gap-1"><i data-lucide="settings" class="w-3.5 h-3.5 accent-text"></i> <span data-i18n="secRateTitle">၁။ ဆိုင်နှုန်းထားများနှင့် ဘာသာစကား</span></div>
                 <div><label class="text-gray-400 block mb-1" data-i18n="shopNameLbl">ဆိုင်အမည်</label><input type="text" id="settingShopName" class="w-full bg-slate-900/50 border border-gray-800 rounded-xl px-3 py-2 text-white outline-none"></div>
@@ -341,7 +338,6 @@
                 <button onclick="saveSettings()" class="w-full py-2.5 accent-btn text-xs font-bold text-white rounded-xl cursor-pointer" data-i18n="saveSettingsBtn">ဆက်တင်များ သိမ်းဆည်းမည်</button>
             </div>
 
-            <!-- CATEGORIZED USER GUIDE -->
             <div class="space-y-3 text-xs text-gray-300 leading-relaxed pt-1">
                 <div class="font-bold text-white text-xs flex items-center gap-1 border-b border-gray-800 pb-1">
                     <i data-lucide="book-open" class="w-3.5 h-3.5 accent-text"></i> <span>၂။ အသုံးပြုပုံ အသေးစိတ် လမ်းညွှန်ချက်များ</span>
@@ -350,7 +346,6 @@
                 <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
                     <div class="font-bold text-indigo-400 flex items-center gap-1">🎮 ၁။ PlayStation ဂိမ်းစက်များ အသုံးပြုပုံ</div>
                     <p>• <b>စက်အသစ်ထည့်ခြင်း:</b> ညာဘက်အပေါ်ရှိ "+ စက်အသစ်" ခလုတ်ကို နှိပ်ပါ။</p>
-                    <p>• <b>စတင်ချိန်သက်သေ:</b> "စတင်" (Start) နှိပ်လိုက်ပါက စတင်သည့်အချိန် (Start Time) ကို ကတ်ပြားပေါ်တွင် သက်သေအဖြစ် အတိအကျ ပြသပေးပါသည်။</p>
                 </div>
 
                 <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
@@ -360,19 +355,26 @@
 
                 <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
                     <div class="font-bold text-emerald-400 flex items-center gap-1">🖨️ ၃။ Bluetooth & Printer အသုံးပြုပုံ</div>
-                    <p>• <b>Printer ဖြင့် ငွေရှင်းခြင်း:</b> "ရှင်းမည်" ခလုတ်ကို နှိပ်လိုက်ပါက စုစုပေါင်း စာရင်းအကျဉ်းချုပ် ပေါ်လာမည်ဖြစ်ပြီး Printer ဖြင့် ရိုက်မည် သို့မဟုတ် ရိုးရိုးရှင်းမည် ရွေးချယ်နိုင်ပါသည်။</p>
+                    <p>• <b>Printer ဖြင့် ငွေရှင်းခြင်း:</b> "ရှင်းမည်" ခလုတ်ကို နှိပ်ပါက စုစုပေါင်း စာရင်းအကျဉ်းချုပ် ပေါ်လာပါမည်။</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- SERVICE WORKER REGISTRATION FOR PWA ---
+        // --- PROPER SERVICE WORKER FOR ANDROID CHROME PWA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",function(e){});')
-                .then(reg => console.log('Service Worker registered!'))
-                .catch(err => console.log('Service Worker error: ', err));
+                navigator.serviceWorker.register('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png') // Dummy scope bypass or standard registration
+                .catch(err => console.log(':))'));
+                
+                // Actual inline blob service worker registration for standalone check
+                const swCode = `self.addEventListener('fetch', function(event) { event.respondWith(fetch(event.request)); });`;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl)
+                    .then(() => console.log("PWA Service Worker Active"))
+                    .catch(err => console.log("SW registration failed", err));
             });
         }
 
