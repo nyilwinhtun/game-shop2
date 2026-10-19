@@ -115,7 +115,7 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-24 select-none">
 
-    <!-- ANDROID AUTO INSTALL PROMPT BANNER (Realme / Android Supported) -->
+    <!-- AUTO INSTALL BANNER -->
     <div id="installContainer" class="fixed bottom-16 left-3 right-3 z-50 hidden glass-card p-4 rounded-2xl border border-indigo-500/50 shadow-2xl flex items-center justify-between gap-3 bg-slate-900/95">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl accent-btn flex items-center justify-center text-white font-bold text-base">GBT</div>
@@ -353,34 +353,37 @@
     </div>
 
     <script>
-        // --- REALME / ANDROID AUTO INSTALL BANNER SYSTEM ---
+        // --- CHROME NATIVE INSTALL PROMPT LISTENER ---
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            // Firebase ကဲ့သို့ အလိုအလျောက် ပေါ်လာစေရန် သို့မဟုတ် Banner ပြရန်
             const container = document.getElementById('installContainer');
             if (container) {
                 container.classList.remove('hidden');
             }
         });
 
-        function triggerInstall() {
+        async function triggerInstall() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    }
-                    deferredPrompt = null;
-                    const container = document.getElementById('installContainer');
-                    if (container) container.classList.add('hidden');
-                });
+                const choiceResult = await deferredPrompt.userChoice;
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+                const container = document.getElementById('installContainer');
+                if (container) container.classList.add('hidden');
             }
         }
 
+        // --- SERVICE WORKER REGISTRATION (CRITICAL FOR CHROME INSTALL PROMPT) ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('ServiceWorker registration successful'))
+                    .catch(err => console.log('ServiceWorker registration failed: ', err));
             });
         }
 
@@ -893,7 +896,7 @@
         }
 
         function updateAnalyticsUI() {
-            document.getElementById("analyticsTotalRevenue").innerText = totalRevenueToday.toLocaleString() + " ကျပ်";
+            document.getElementById("analyticsTotalRevenue").innerText = totalRevenueTotal.toLocaleString() + " ကျပ်";
             document.getElementById("analyticsGameRevenue").innerText = gameRevenueToday.toLocaleString() + " ကျပ်";
             document.getElementById("analyticsPosRevenue").innerText = posRevenueToday.toLocaleString() + " ကျပ်";
         }
