@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game & Billiards Timer</title>
     
-    <!-- PWA External Manifest & Meta Tags -->
+    <!-- PWA External Manifest & iOS Support -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -115,19 +115,16 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans pb-24 select-none">
 
-    <!-- AUTO INSTALL BANNER (POP-UP) -->
-    <div id="installBanner" class="fixed bottom-16 left-3 right-3 z-50 hidden glass-card p-4 rounded-2xl border border-indigo-500/40 shadow-2xl flex items-center justify-between gap-3">
+    <!-- AUTO INSTALL BANNER -->
+    <div id="installContainer" class="fixed bottom-16 left-3 right-3 z-50 hidden glass-card p-4 rounded-2xl border border-indigo-500/50 shadow-2xl flex items-center justify-between gap-3 bg-slate-900/95">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl accent-btn flex items-center justify-center text-white font-bold text-base">GBT</div>
             <div>
-                <h4 class="text-xs font-bold text-white">App ကို ဖုန်းတွင် တင်မည်လား?</h4>
-                <p class="text-[10px] text-gray-400">Home Screen တွင် ထည့်သွင်းပြီး အလွယ်တကူ သုံးပါ။</p>
+                <h4 class="text-xs font-bold text-white" data-i18n="installPromptTitle">App ကို ဖုန်းတွင် Install တင်ရန်</h4>
+                <p class="text-[10px] text-gray-400" data-i18n="installPromptSub">Home Screen သို့ ထည့်သွင်းပါ</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <button onclick="dismissInstallBanner()" class="px-3 py-1.5 bg-slate-800 text-gray-300 rounded-xl text-xs cursor-pointer">မလုပ်တော့ပါ</button>
-            <button onclick="triggerInstall()" class="px-3 py-1.5 accent-btn text-white font-bold rounded-xl text-xs cursor-pointer shadow">Install</button>
-        </div>
+        <button onclick="triggerInstall()" class="px-4 py-2 accent-btn text-white font-bold rounded-xl text-xs cursor-pointer shadow-lg">Install Now</button>
     </div>
 
     <!-- AUTH OVERLAY -->
@@ -357,20 +354,9 @@
                 <div class="font-bold text-white text-xs flex items-center gap-1 border-b border-gray-800 pb-1">
                     <i data-lucide="book-open" class="w-3.5 h-3.5 accent-text"></i> <span>၂။ အသုံးပြုပုံ အသေးစိတ် လမ်းညွှန်ချက်များ</span>
                 </div>
-
                 <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
-                    <div class="font-bold text-indigo-400 flex items-center gap-1">🎮 ၁။ PlayStation ဂိမ်းစက်များ အသုံးပြုပုံ</div>
-                    <p>• <b>စက်အသစ်ထည့်ခြင်း:</b> ညာဘက်အပေါ်ရှိ "+ စက်အသစ်" ခလုတ်ကို နှိပ်ပါ။</p>
-                </div>
-
-                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
-                    <div class="font-bold text-amber-400 flex items-center gap-1">🎱 ၂။ ဘိလိယက်ခုံများ အသုံးပြုပုံ</div>
-                    <p>• <b>မုဒ်ပြောင်းလဲခြင်း:</b> "နာရီ" သို့မဟုတ် "ပွဲစဉ်" ခလုတ်ကို နှိပ်၍ မုဒ်ပြောင်းနိုင်ပါသည်။</p>
-                </div>
-
-                <div class="bg-slate-950/40 p-3 rounded-xl space-y-1 border border-gray-800/80">
-                    <div class="font-bold text-emerald-400 flex items-center gap-1">🖨️ ၃။ Bluetooth & Printer အသုံးပြုပုံ</div>
-                    <p>• <b>Printer ဖြင့် ငွေရှင်းခြင်း:</b> "ရှင်းမည်" ခလုတ်ကို နှိပ်ပါက စုစုပေါင်း စာရင်းအကျဉ်းချုပ် ပေါ်လာပါမည်။</p>
+                    <div class="font-bold text-indigo-400">🎮 PlayStation နှင့် ဘိလိယက်ခုံများ စီမံခန့်ခွဲပုံ</div>
+                    <p>• Start / Stop နှိပ်၍ အချိန်စတင်ရေတွက်နိုင်ပြီး POS မှ မုန့်နှင့် အဖျော်ယမကာများ ထပ်မံပေါင်းထည့်နိုင်ပါသည်။</p>
                 </div>
             </div>
         </div>
@@ -382,7 +368,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('installBanner').classList.remove('hidden');
+            document.getElementById('installContainer').classList.remove('hidden');
         });
 
         function triggerInstall() {
@@ -390,16 +376,12 @@
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
+                        console.log('User accepted install');
                     }
                     deferredPrompt = null;
-                    document.getElementById('installBanner').classList.add('hidden');
+                    document.getElementById('installContainer').classList.add('hidden');
                 });
             }
-        }
-
-        function dismissInstallBanner() {
-            document.getElementById('installBanner').classList.add('hidden');
         }
 
         if ('serviceWorker' in navigator) {
@@ -408,6 +390,7 @@
             });
         }
 
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyAto7pibrqOrxaRrOExDmJQX11Ybv_9zPs",
             authDomain: "my-website-1b6b7.firebaseapp.com",
@@ -455,6 +438,8 @@
 
         const translations = {
             my: {
+                installPromptTitle: "App ကို ဖုန်းတွင် Install တင်ရန်",
+                installPromptSub: "Home Screen သို့ ထည့်သွင်းပါ",
                 loginTitle: "အကောင့်ဝင်ရန် (Login)",
                 emailLabel: "အီးမေးလ် (Email)",
                 passLabel: "စကားဝှက် (Password)",
@@ -491,6 +476,8 @@
                 saveSettingsBtn: "ဆက်တင်များ သိမ်းဆည်းမည်"
             },
             en: {
+                installPromptTitle: "Install App on Phone",
+                installPromptSub: "Add to Home Screen",
                 loginTitle: "Login to Account",
                 emailLabel: "Email Address",
                 passLabel: "Password",
@@ -564,12 +551,7 @@
                 type: 'bar',
                 data: {
                     labels: ['12AM', '3AM', '6AM', '9AM', '12PM', '3PM', '6PM', '9PM'],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [0, 0, 0, 10000, 25000, 45000, 80000, 60000],
-                        backgroundColor: '#6366f1',
-                        borderRadius: 6
-                    }]
+                    datasets: [{ label: 'Revenue', data: [0, 0, 0, 10000, 25000, 45000, 80000, 60000], backgroundColor: '#6366f1', borderRadius: 6 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
@@ -579,14 +561,7 @@
                 type: 'line',
                 data: {
                     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Weekly Trend',
-                        data: weeklyData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
+                    datasets: [{ label: 'Weekly Trend', data: weeklyData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
@@ -602,11 +577,8 @@
             const email = document.getElementById("authEmail").value.trim();
             const password = document.getElementById("authPassword").value.trim();
             if (!email || !password) return alert("Email & Password required.");
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                alert("Login Error: " + error.message);
-            }
+            try { await auth.signInWithEmailAndPassword(email, password); } 
+            catch (error) { alert("Login Error: " + error.message); }
         }
 
         function logout() {
@@ -692,7 +664,6 @@
                             <span class="font-bold text-xs truncate max-w-[80px]">${item.name}</span>
                             ${modeIconBtn}
                         </div>
-
                         ${item.mode === 'TIMER' ? `
                             <div class="text-center py-1.5 bg-slate-950/40 rounded-lg border border-gray-800 space-y-0.5">
                                 <div class="text-base font-mono font-bold">${formatTime(item.elapsedSeconds)}</div>
@@ -706,7 +677,6 @@
                                 <button onclick="addPoolGame(${item.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-bold rounded cursor-pointer">+1 Game</button>
                             </div>
                         `}
-
                         <div class="flex justify-between items-center text-[10px] bg-slate-950/30 px-2 py-1 rounded-lg">
                             <span class="text-gray-300">Items (${ordersCount})</span>
                             <button onclick="openOrderModal('pool', ${item.id})" class="p-1 rounded bg-indigo-600/30 hover:bg-indigo-600 text-white cursor-pointer"><i data-lucide="plus" class="w-3 h-3"></i></button>
@@ -726,12 +696,7 @@
             let item = list.find(s => s.id === id);
             if (!item) return;
 
-            let timeCost = 0;
-            if(type === 'ps4') {
-                timeCost = Math.ceil((item.elapsedSeconds / 3600) * appState.ps4Rate);
-            } else {
-                timeCost = item.mode === 'TIMER' ? Math.ceil((item.elapsedSeconds / 3600) * appState.poolRate) : (item.gamesPlayed * appState.poolGameRate);
-            }
+            let timeCost = type === 'ps4' ? Math.ceil((item.elapsedSeconds / 3600) * appState.ps4Rate) : (item.mode === 'TIMER' ? Math.ceil((item.elapsedSeconds / 3600) * appState.poolRate) : (item.gamesPlayed * appState.poolGameRate));
             let orderCost = item.orders.reduce((sum, o) => sum + (o.price * o.qty), 0);
             let grandTotal = timeCost + orderCost;
 
@@ -749,17 +714,11 @@
             if (item.orders.length > 0) {
                 ordersContainer.classList.remove("hidden");
                 item.orders.forEach(o => {
-                    ordersList.innerHTML += `
-                        <div class="flex justify-between text-[11px]">
-                            <span>${o.name} (x${o.qty})</span>
-                            <span class="font-semibold text-white">${(o.price * o.qty).toLocaleString()} ကျပ်</span>
-                        </div>
-                    `;
+                    ordersList.innerHTML += `<div class="flex justify-between text-[11px]"><span>${o.name} (x${o.qty})</span><span class="font-semibold text-white">${(o.price * o.qty).toLocaleString()} ကျပ်</span></div>`;
                 });
             } else {
                 ordersContainer.classList.add("hidden");
             }
-
             document.getElementById("checkoutModal").classList.remove("hidden");
         }
 
@@ -812,9 +771,7 @@
             let item = appState.poolTables.find(t => t.id === id);
             if(item) {
                 item.gamesPlayed += 1;
-                if(!item.startTime) {
-                    item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                }
+                if(!item.startTime) item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 saveToCloud();
                 renderPoolGrid();
             }
@@ -823,14 +780,10 @@
         function togglePoolTimer(id) {
             let item = appState.poolTables.find(t => t.id === id);
             if(item) {
+                item.status = item.status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
                 if(item.status === 'RUNNING') {
-                    item.status = 'PAUSED';
-                } else {
-                    item.status = 'RUNNING';
                     item.lastTick = Date.now();
-                    if(!item.startTime) {
-                        item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    }
+                    if(!item.startTime) item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
                 saveToCloud();
                 renderPoolGrid();
@@ -842,12 +795,7 @@
             const grid = document.getElementById("modalProductGrid");
             grid.innerHTML = "";
             appState.products.forEach(p => {
-                grid.innerHTML += `
-                    <div onclick="orderProductToStation(${p.id})" class="glass-card p-2.5 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition">
-                        <div class="font-bold text-[11px]">${p.name}</div>
-                        <div class="text-[9px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
-                    </div>
-                `;
+                grid.innerHTML += `<div onclick="orderProductToStation(${p.id})" class="glass-card p-2.5 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition"><div class="font-bold text-[11px]">${p.name}</div><div class="text-[9px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div></div>`;
             });
             document.getElementById("orderModal").classList.remove("hidden");
         }
@@ -865,8 +813,8 @@
 
             if (prod && item) {
                 let existing = item.orders.find(o => o.id === productId);
-                if (existing) { existing.qty += 1; } 
-                else { item.orders.push({ id: prod.id, name: prod.name, price: prod.price, qty: 1 }); }
+                if (existing) existing.qty += 1;
+                else item.orders.push({ id: prod.id, name: prod.name, price: prod.price, qty: 1 });
                 saveToCloud();
                 renderAllGrids();
                 closeOrderModal();
@@ -887,13 +835,7 @@
             container.innerHTML = "";
             const filtered = activePosCategory === 'ALL' ? appState.products : appState.products.filter(p => p.category === activePosCategory);
             filtered.forEach(p => {
-                container.innerHTML += `
-                    <div class="glass-card p-3 rounded-xl text-center space-y-1">
-                        <div class="font-bold text-xs">${p.name}</div>
-                        <div class="text-[9px] text-indigo-300">${p.category}</div>
-                        <div class="text-[10px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div>
-                    </div>
-                `;
+                container.innerHTML += `<div class="glass-card p-3 rounded-xl text-center space-y-1"><div class="font-bold text-xs">${p.name}</div><div class="text-[9px] text-indigo-300">${p.category}</div><div class="text-[10px] text-emerald-400 font-semibold">${p.price.toLocaleString()} ကျပ်</div></div>`;
             });
         }
 
@@ -923,14 +865,10 @@
             const list = type === 'ps4' ? appState.ps4Stations : appState.poolTables;
             let item = list.find(s => s.id === id);
             if (item) {
+                item.status = item.status === 'RUNNING' ? 'PAUSED' : 'RUNNING';
                 if(item.status === 'RUNNING') {
-                    item.status = 'PAUSED';
-                } else {
-                    item.status = 'RUNNING';
                     item.lastTick = Date.now();
-                    if(!item.startTime) {
-                        item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    }
+                    if(!item.startTime) item.startTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 }
                 saveToCloud();
                 renderAllGrids();
@@ -939,48 +877,25 @@
 
         async function connectBluetoothPrinter() {
             try {
-                if (!navigator.bluetooth) {
-                    alert("Your browser does not support Web Bluetooth.");
-                    return;
-                }
-                bluetoothDevice = await navigator.bluetooth.requestDevice({
-                    acceptAllDevices: true,
-                    optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-                });
-                alert("Bluetooth Printer Connected: " + bluetoothDevice.name);
-            } catch (error) {
-                alert("Bluetooth Connection Cancelled or Failed: " + error);
-            }
+                if (!navigator.bluetooth) { alert("Web Bluetooth not supported."); return; }
+                bluetoothDevice = await navigator.bluetooth.requestDevice({ acceptAllDevices: true, optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] });
+                alert("Connected: " + bluetoothDevice.name);
+            } catch (error) { alert("Bluetooth Error: " + error); }
         }
 
         async function printViaBluetooth(stationName, timeCost, orders, total, startTime) {
-            let receipt = `=== ${appState.shopName} ===\n`;
-            receipt += `Station: ${stationName}\n`;
-            receipt += `Start Time: ${startTime || 'N/A'}\n`;
-            receipt += `Time Cost: ${timeCost} MMK\n`;
-            if(orders.length > 0) {
-                receipt += `--- Items ---\n`;
-                orders.forEach(o => { receipt += `${o.name} (x${o.qty}): ${o.price * o.qty} MMK\n`; });
-            }
-            receipt += `--------------------\n`;
-            receipt += `TOTAL: ${total} MMK\n`;
-            receipt += `Thank You!\n\n\n`;
-
+            let receipt = `=== ${appState.shopName} ===\nStation: ${stationName}\nStart: ${startTime || 'N/A'}\nTime Cost: ${timeCost} MMK\n`;
+            orders.forEach(o => { receipt += `${o.name} (x${o.qty}): ${o.price * o.qty} MMK\n`; });
+            receipt += `TOTAL: ${total} MMK\nThank You!\n\n`;
             if (bluetoothDevice && bluetoothDevice.gatt.connected) {
                 try {
                     const server = await bluetoothDevice.gatt.connect();
                     const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-                    const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-                    const encoder = new TextEncoder();
-                    await characteristic.writeValue(encoder.encode(receipt));
-                    alert("Receipt printed successfully!");
-                } catch(e) {
-                    console.log("Print error:", e);
-                }
-            } else {
-                console.log("Receipt Data:\n" + receipt);
-                alert("Receipt generated (Bluetooth printer option selected).");
-            }
+                    const char = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+                    await char.writeValue(new TextEncoder().encode(receipt));
+                    alert("Printed successfully!");
+                } catch(e) { console.log(e); }
+            } else { alert("Receipt Generated."); }
         }
 
         function updateAnalyticsUI() {
@@ -1012,8 +927,8 @@
             document.getElementById("settingPsRate").value = appState.ps4Rate;
             document.getElementById("settingPoolRate").value = appState.poolRate;
             document.getElementById("settingGameRate").value = appState.poolGameRate;
-            if(appState.theme) document.getElementById("themeSelect").value = appState.theme;
-            if(appState.lang) document.getElementById("langSelect").value = appState.lang;
+            document.getElementById("themeSelect").value = appState.theme;
+            document.getElementById("langSelect").value = appState.lang;
             document.getElementById("settingsModal").classList.remove("hidden");
         }
 
@@ -1024,24 +939,18 @@
             appState.ps4Rate = parseFloat(document.getElementById("settingPsRate").value) || appState.ps4Rate;
             appState.poolRate = parseFloat(document.getElementById("settingPoolRate").value) || appState.poolRate;
             appState.poolGameRate = parseFloat(document.getElementById("settingGameRate").value) || appState.poolGameRate;
-            saveToCloud(); updateHeaderUI(); closeSettingsModal();
-        }
-
-        function updateHeaderUI() {
+            saveToCloud();
             document.getElementById("headerShopName").innerText = appState.shopName;
+            closeSettingsModal();
         }
 
         function saveToCloud() {
             const user = auth.currentUser;
             if(!user) return;
             db.collection("shops").doc(user.uid).set({
-                appState,
-                totalRevenueToday,
-                gameRevenueToday,
-                posRevenueToday,
-                weeklyData,
+                appState, totalRevenueToday, gameRevenueToday, posRevenueToday, weeklyData,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).catch(err => console.log("Cloud Save Error:", err));
+            }).catch(err => console.log(err));
         }
 
         function loadFromCloud() {
@@ -1058,9 +967,9 @@
                     if(appState.theme) document.documentElement.setAttribute('data-theme', appState.theme);
                     if(appState.lang) applyTranslations();
                 }
-                updateHeaderUI();
+                document.getElementById("headerShopName").innerText = appState.shopName;
                 renderAllGrids();
-            }).catch(err => console.log("Cloud Load Error:", err));
+            }).catch(err => console.log(err));
         }
     </script>
 </body>
